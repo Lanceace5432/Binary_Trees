@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Search Tree Visualizer</title>
+    <!-- Tailwind CSS for utility styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Pixel Art font -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        /* Pixel-art styling theme token overrides */
+        :root {
+            --pixel-bg: #f4e4bc;
+            --pixel-bg-dark: #e5cd94;
+            --pixel-border-dark: #5c3818;
+            --pixel-border-light: #b0824e;
+            --pixel-accent-gold: #e6a817;
+            --pixel-btn-green: #5a8738;
+            --pixel-btn-green-hover: #486f2b;
+            --pixel-btn-red: #ab3c2d;
+            --pixel-btn-red-hover: #882c1f;
+            --pixel-btn-blue: #3b759e;
+            --pixel-btn-blue-hover: #2c597a;
+            --pixel-text-dark: #2a1a08;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #2b1f17;
+            color: var(--pixel-text-dark);
+            image-rendering: pixelated;
+        }
+
+        .font-pixel-heading {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        /* Pixelated Frame / Box styling */
+        .pixel-panel {
+            background-color: var(--pixel-bg);
+            border: 4px solid var(--pixel-border-dark);
+            box-shadow: 
+                inset -4px -4px 0px 0px #c2a770,
+                inset 4px 4px 0px 0px #fff4d4,
+                0px 6px 0px 0px #1a1008;
+            position: relative;
+        }
+
+        .pixel-panel-header {
+            background-color: #3b2310;
+            color: #fce8a6;
+            border-bottom: 4px solid var(--pixel-border-dark);
+        }
+
+        .pixel-inset {
+            background-color: #e5cd94;
+            border: 3px solid #8c5d2e;
+            box-shadow: inset 3px 3px 0px #38210c, inset -3px -3px 0px #f8e8c8;
+        }
+
+        .pixel-code-bg {
+            background-color: #231b15;
+            color: #d1c2a5;
+            border: 3px solid #5c3818;
+            box-shadow: inset 3px 3px 0px #120d09;
+        }
+
+        /* Buttons */
+        .pixel-btn {
+            font-family: 'VT323', monospace;
+            font-size: 1.25rem;
+            color: #ffffff;
+            text-shadow: 1px 1px 0px #000;
+            border: 3px solid #1a1008;
+            box-shadow: inset -3px -3px 0px rgba(0,0,0,0.4), inset 3px 3px 0px rgba(255,255,255,0.3);
+            transition: all 0.05s ease;
+            position: relative;
+            top: 0;
+            user-select: none;
+        }
+
+        .pixel-btn:active {
+            top: 3px;
+            box-shadow: inset 3px 3px 0px rgba(0,0,0,0.6);
+        }
+
+        .pixel-btn-green { background-color: var(--pixel-btn-green); }
+        .pixel-btn-green:hover { background-color: var(--pixel-btn-green-hover); }
+
+        .pixel-btn-red { background-color: var(--pixel-btn-red); }
+        .pixel-btn-red:hover { background-color: var(--pixel-btn-red-hover); }
+
+        .pixel-btn-blue { background-color: var(--pixel-btn-blue); }
+        .pixel-btn-blue:hover { background-color: var(--pixel-btn-blue-hover); }
+
+        .pixel-btn-gold { background-color: var(--pixel-accent-gold); color: #2b1f17; text-shadow: none; font-weight: bold; }
+        .pixel-btn-gold:hover { background-color: #cb920e; }
+
+        .pixel-btn:disabled {
+            background-color: #7a7067 !important;
+            opacity: 0.6;
+            cursor: not-allowed;
+            top: 0 !important;
+        }
+
+        /* Code Line Highlighting */
+        .code-line {
+            padding: 2px 8px;
+            border-left: 4px solid transparent;
+            font-family: monospace;
+            font-size: 0.95rem;
+            white-space: pre;
+            line-height: 1.35;
+        }
+
+        .code-line.active {
+            background-color: #5c4213;
+            border-left-color: #facc15;
+            color: #fffde0;
+            font-weight: bold;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #231b15;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8c5d2e;
+            border: 2px solid #231b15;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b0824e;
+        }
+
+        /* Dynamic Canvas Container */
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            min-height: 420px;
+            position: relative;
+            overflow: hidden;
+            background-color: #ebd39e;
+            background-image: radial-gradient(#d3b87d 15%, transparent 16%);
+            background-size: 16px 16px;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-2 md:p-4 flex flex-col">
+
+    <!-- Header Banner -->
+    <header class="pixel-panel mb-4 p-3 flex flex-wrap justify-between items-center bg-[#422915]">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-[#e6a817] border-2 border-black flex items-center justify-center font-pixel-heading text-xs text-black">
+                BST
+            </div>
+            <h1 class="font-pixel-heading text-lg sm:text-xl text-[#fce8a6] tracking-wide">
+                Binary Search Tree Visualizer
+            </h1>
+        </div>
+        <div class="text-sm text-[#d1b88e] flex items-center gap-2 mt-2 sm:mt-0">
+            <span class="inline-block w-3 h-3 bg-green-600 rounded-full border border-black"></span>
+            Algorithm Execution Engine
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
+
+        <!-- Left Side Panel: Source Code & Trace Execution -->
+        <section class="lg:col-span-5 flex flex-col gap-3">
+            <div class="pixel-panel flex-1 flex flex-col min-h-[450px]">
+                <!-- Panel Header with Code Selection Tabs -->
+                <div class="pixel-panel-header px-4 py-2 flex items-center justify-between">
+                    <span class="font-pixel-heading text-xs">SOURCE CODE (JavaScript)</span>
+                    <div class="flex gap-1" id="code-tabs">
+                        <button onclick="switchTab('insert')" id="tab-insert" class="px-2 py-0.5 text-sm bg-[#5c3818] text-[#fce8a6] border border-[#8c5d2e] rounded-t font-bold">Insert</button>
+                        <button onclick="switchTab('search')" id="tab-search" class="px-2 py-0.5 text-sm bg-[#2b1f17] text-[#aa9578] border border-[#5c3818] rounded-t">Search</button>
+                        <button onclick="switchTab('delete')" id="tab-delete" class="px-2 py-0.5 text-sm bg-[#2b1f17] text-[#aa9578] border border-[#5c3818] rounded-t">Delete</button>
+                    </div>
+                </div>
+
+                <!-- Code Block Viewport -->
+                <div class="p-3 flex-1 flex flex-col">
+                    <div class="pixel-code-bg flex-1 overflow-y-auto p-2 text-xs sm:text-sm font-mono leading-relaxed relative" id="code-container">
+                        <!-- Dynamic code lines inserted by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Execution Step Log Box -->
+                <div class="p-3 pt-0">
+                    <div class="text-xs font-pixel-heading text-[#5c3818] mb-1">EXECUTION LOG:</div>
+                    <div id="log-box" class="pixel-inset p-2 h-24 overflow-y-auto text-sm text-[#2a1a08] font-mono leading-tight">
+                        <div class="text-[#6b5235] italic">> Visualizer ready. Select an operation below...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Side Panel: Visualization Canvas & Interactive Controls -->
+        <section class="lg:col-span-7 flex flex-col gap-3">
+            
+            <!-- Controls Toolbar Panel -->
+            <div class="pixel-panel p-3">
+                <div class="flex flex-wrap gap-2 items-center justify-between">
+                    
+                    <!-- Input & Operation Buttons -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="flex items-center">
+                            <label for="node-value" class="sr-only">Node Value</label>
+                            <input type="number" id="node-value" placeholder="Val (0-99)" min="0" max="99" 
+                                class="w-24 p-2 pixel-inset font-bold text-center text-lg text-[#2a1a08] outline-none focus:ring-2 focus:ring-[#8c5d2e]" 
+                                onkeydown="if(event.key === 'Enter') handleInsert()"/>
+                        </div>
+
+                        <button id="btn-insert" onclick="handleInsert()" class="pixel-btn pixel-btn-green px-3 py-1.5">
+                            + Insert
+                        </button>
+                        <button id="btn-search" onclick="handleSearch()" class="pixel-btn pixel-btn-blue px-3 py-1.5">
+                            ? Search
+                        </button>
+                        <button id="btn-delete" onclick="handleDelete()" class="pixel-btn pixel-btn-red px-3 py-1.5">
+                            - Delete
+                        </button>
+                    </div>
+
+                    <!-- Preset & Utility Actions -->
+                    <div class="flex items-center gap-2">
+                        <button id="btn-random" onclick="handleGenerateRandom()" class="pixel-btn pixel-btn-gold px-3 py-1.5 text-xs">
+                            Random Tree
+                        </button>
+                        <button id="btn-clear" onclick="handleClear()" class="pixel-btn bg-[#6e6359] hover:bg-[#574e46] px-3 py-1.5 text-xs">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Animation Delay Control Slider -->
+                <div class="mt-3 pt-2 border-t border-[#c2a770] flex items-center justify-between text-xs sm:text-sm font-bold text-[#4a3219]">
+                    <div class="flex items-center gap-2">
+                        <span>Speed:</span>
+                        <input type="range" id="speed-range" min="200" max="1800" step="100" value="900" 
+                               class="accent-[#5c3818] cursor-pointer" onchange="updateSpeedLabel()"/>
+                        <span id="speed-label" class="w-12 text-center">900ms</span>
+                    </div>
+                    <div id="status-badge" class="px-2 py-0.5 pixel-inset bg-[#f3e3bc] text-[#5c3818] font-mono text-xs">
+                        STATUS: IDLE
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization Canvas Box -->
+            <div class="pixel-panel flex-1 flex flex-col min-h-[420px]">
+                <div class="pixel-panel-header px-4 py-2 flex justify-between items-center">
+                    <span class="font-pixel-heading text-xs">BST CANVAS VISUALIZATION</span>
+                    <div class="text-xs text-[#d1b88e] flex items-center gap-3">
+                        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#3b759e] border border-black inline-block"></span> Normal</span>
+                        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#facc15] border border-black inline-block"></span> Visiting</span>
+                        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#22c55e] border border-black inline-block"></span> Target</span>
+                    </div>
+                </div>
+
+                <!-- Canvas Rendering Area -->
+                <div class="flex-1 p-2 relative flex flex-col">
+                    <div id="canvas-container" class="flex-1 rounded pixel-inset relative">
+                        <canvas id="bst-canvas" class="w-full h-full block"></canvas>
+                        
+                        <!-- Floating Comparison Status Popup Overlay -->
+                        <div id="comparison-badge" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 pixel-panel px-4 py-2 bg-[#fef3c7] border-2 border-[#b45309] text-[#78350f] font-pixel-heading text-xs sm:text-sm shadow-lg text-center z-10 animate-bounce">
+                            COMPARISON STATUS
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <!-- Algorithm Code Snippets Data & Application Logic -->
+    <script>
+        // --- Code Snippets Definitions for Source Code Panel ---
+        const CODE_SNIPPETS = {
+            insert: [
+                { line: 1, text: "function insert(node, value) {" },
+                { line: 2, text: "    if (node === null) {" },
+                { line: 3, text: "        return new Node(value);" },
+                { line: 4, text: "    }" },
+                { line: 5, text: "    if (value < node.value) {" },
+                { line: 6, text: "        node.left = insert(node.left, value);" },
+                { line: 7, text: "    } else if (value > node.value) {" },
+                { line: 8, text: "        node.right = insert(node.right, value);" },
+                { line: 9, text: "    }" },
+                { line: 10, text: "    return node;" },
+                { line: 11, text: "}" }
+            ],
+            search: [
+                { line: 1, text: "function search(node, value) {" },
+                { line: 2, text: "    if (node === null) return null;" },
+                { line: 3, text: "    if (node.value === value) return node;" },
+                { line: 4, text: "    if (value < node.value) {" },
+                { line: 5, text: "        return search(node.left, value);" },
+                { line: 6, text: "    } else {" },
+                { line: 7, text: "        return search(node.right, value);" },
+                { line: 8, text: "    }" },
+                { line: 9, text: "}" }
+            ],
+            delete: [
+                { line: 1, text: "function deleteNode(node, value) {" },
+                { line: 2, text: "    if (node === null) return null;" },
+                { line: 3, text: "    if (value < node.value) {" },
+                { line: 4, text: "        node.left = deleteNode(node.left, value);" },
+                { line: 5, text: "    } else if (value > node.value) {" },
+                { line: 6, text: "        node.right = deleteNode(node.right, value);" },
+                { line: 7, text: "    } else { // Node found" },
+                { line: 8, text: "        if (!node.left && !node.right) return null; // Case 1: Leaf" },
+                { line: 9, text: "        if (!node.left) return node.right;          // Case 2: 1 child" },
+                { line: 10, text: "        if (!node.right) return node.left;         // Case 2: 1 child" },
+                { line: 11, text: "        let successor = getMin(node.right);        // Case 3: 2 children" },
+                { line: 12, text: "        node.value = successor.value;" },
+                { line: 13, text: "        node.right = deleteNode(node.right, successor.value);" },
+                { line: 14, text: "    }" },
+                { line: 15, text: "    return node;" },
+                { line: 16, text: "}" }
+            ]
+        };
+
+        // --- BST Data Structure ---
+        class BSTNode {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+                // Visualization attributes
+                this.x = 0;
+                this.y = 0;
+                this.state = 'normal'; // 'normal', 'visiting', 'found', 'target'
+            }
+        }
+
+        class BinarySearchTree {
+            constructor() {
+                this.root = null;
+            }
+        }
+
+        // --- Application State ---
+        const bst = new BinarySearchTree();
+        let currentTab = 'insert';
+        let isAnimating = false;
+        let animationDelay = 900;
+
+        // Canvas Setup
+        const canvas = document.getElementById('bst-canvas');
+        const ctx = canvas.getContext('2d');
+        const canvasContainer = document.getElementById('canvas-container');
+
+        // --- Initialization ---
+        window.onload = () => {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            renderCodeSnippet('insert');
+            updateSpeedLabel();
+
+            // Seed initial balanced tree for demonstration
+            const initialValues = [50, 25, 75, 12, 37, 62, 87];
+            initialValues.forEach(val => rawInsert(bst, val));
+            recalculateNodePositions();
+            drawTree();
+            logMessage("Initialized visualizer with sample Binary Search Tree.");
+        };
+
+        function resizeCanvas() {
+            canvas.width = canvasContainer.clientWidth;
+            canvas.height = canvasContainer.clientHeight;
+            recalculateNodePositions();
+            drawTree();
+        }
+
+        function updateSpeedLabel() {
+            const val = document.getElementById('speed-range').value;
+            animationDelay = parseInt(val, 10);
+            document.getElementById('speed-label').innerText = `${val}ms`;
+        }
+
+        // --- Code Panel Tab Switcher ---
+        function switchTab(tabName) {
+            currentTab = tabName;
+            ['insert', 'search', 'delete'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tabName) {
+                    btn.className = "px-2 py-0.5 text-sm bg-[#5c3818] text-[#fce8a6] border border-[#8c5d2e] rounded-t font-bold";
+                } else {
+                    btn.className = "px-2 py-0.5 text-sm bg-[#2b1f17] text-[#aa9578] border border-[#5c3818] rounded-t";
+                }
+            });
+            renderCodeSnippet(tabName);
+        }
+
+        function renderCodeSnippet(snippetKey) {
+            const container = document.getElementById('code-container');
+            container.innerHTML = '';
+            const lines = CODE_SNIPPETS[snippetKey] || [];
+            lines.forEach(item => {
+                const div = document.createElement('div');
+                div.id = `code-line-${item.line}`;
+                div.className = 'code-line';
+                div.innerText = `${item.line.toString().padStart(2, ' ')}  ${item.text}`;
+                container.appendChild(div);
+            });
+        }
+
+        function highlightCodeLine(lineNum) {
+            document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+            if (lineNum) {
+                const target = document.getElementById(`code-line-${lineNum}`);
+                if (target) {
+                    target.classList.add('active');
+                    target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                }
+            }
+        }
+
+        // --- UI Logging & Status Display ---
+        function logMessage(msg) {
+            const logBox = document.getElementById('log-box');
+            const entry = document.createElement('div');
+            entry.className = "mb-1 border-b border-[#c2a770]/30 pb-0.5";
+            entry.innerText = `> ${msg}`;
+            logBox.appendChild(entry);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function updateStatusBadge(text) {
+            document.getElementById('status-badge').innerText = `STATUS: ${text}`;
+        }
+
+        function showComparisonBadge(text) {
+            const badge = document.getElementById('comparison-badge');
+            badge.innerText = text;
+            badge.classList.remove('hidden');
+        }
+
+        function hideComparisonBadge() {
+            document.getElementById('comparison-badge').classList.add('hidden');
+        }
+
+        function setControlsDisabled(disabled) {
+            isAnimating = disabled;
+            const buttons = ['btn-insert', 'btn-search', 'btn-delete', 'btn-random', 'btn-clear'];
+            buttons.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.disabled = disabled;
+            });
+            document.getElementById('node-value').disabled = disabled;
+        }
+
+        // --- Helper: Synchronous Non-Animated Tree Insert ---
+        function rawInsert(tree, value) {
+            const newNode = new BSTNode(value);
+            if (!tree.root) {
+                tree.root = newNode;
+                return;
+            }
+            let curr = tree.root;
+            while (true) {
+                if (value < curr.value) {
+                    if (!curr.left) {
+                        curr.left = newNode;
+                        break;
+                    }
+                    curr = curr.left;
+                } else if (value > curr.value) {
+                    if (!curr.right) {
+                        curr.right = newNode;
+                        break;
+                    }
+                    curr = curr.right;
+                } else {
+                    break; // Ignore duplicates
+                }
+            }
+        }
+
+        // --- Node Layout & Coordinate Calculation ---
+        function recalculateNodePositions() {
+            if (!bst.root) return;
+            const width = canvas.width;
+            const startY = 50;
+            const levelHeight = 65;
+
+            function layout(node, depth, minX, maxX) {
+                if (!node) return;
+                const x = (minX + maxX) / 2;
+                const y = startY + depth * levelHeight;
+                node.x = x;
+                node.y = y;
+
+                layout(node.left, depth + 1, minX, x);
+                layout(node.right, depth + 1, x, maxX);
+            }
+
+            layout(bst.root, 0, 20, width - 20);
+        }
+
+        // --- Canvas Rendering Engine ---
+        function drawTree() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!bst.root) return;
+
+            // Draw Edges First
+            drawEdges(bst.root);
+
+            // Draw Nodes
+            drawNodes(bst.root);
+        }
+
+        function drawEdges(node) {
+            if (!node) return;
+
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#5c3818';
+
+            if (node.left) {
+                ctx.beginPath();
+                ctx.moveTo(node.x, node.y);
+                ctx.lineTo(node.left.x, node.left.y);
+                ctx.stroke();
+                drawEdges(node.left);
+            }
+
+            if (node.right) {
+                ctx.beginPath();
+                ctx.moveTo(node.x, node.y);
+                ctx.lineTo(node.right.x, node.right.y);
+                ctx.stroke();
+                drawEdges(node.right);
+            }
+        }
+
+        function drawNodes(node) {
+            if (!node) return;
+
+            const radius = 20;
+
+            // Determine Fill Style based on animation state
+            let bgColor = '#3b759e';  // Normal default blue
+            let strokeColor = '#1a364a';
+            let textColor = '#ffffff';
+
+            if (node.state === 'visiting') {
+                bgColor = '#e6a817';      // Gold highlight
+                strokeColor = '#5c3818';
+                textColor = '#2b1f17';
+            } else if (node.state === 'found') {
+                bgColor = '#22c55e';      // Green success
+                strokeColor = '#14532d';
+                textColor = '#ffffff';
+            } else if (node.state === 'target') {
+                bgColor = '#ef4444';      // Red target
+                strokeColor = '#7f1d1d';
+                textColor = '#ffffff';
+            }
+
+            // Draw Shadow
+            ctx.beginPath();
+            ctx.arc(node.x + 2, node.y + 3, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.fill();
+
+            // Draw Main Node Circle
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = bgColor;
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = strokeColor;
+            ctx.stroke();
+
+            // Inner Pixel Accent Ring
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, radius - 4, 0, 2 * Math.PI);
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+            ctx.stroke();
+
+            // Node Value Text
+            ctx.font = 'bold 18px "VT323", monospace';
+            ctx.fillStyle = textColor;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(node.value, node.x, node.y + 1);
+
+            // Recursively draw children
+            drawNodes(node.left);
+            drawNodes(node.right);
+        }
+
+        function resetNodeStates(node = bst.root) {
+            if (!node) return;
+            node.state = 'normal';
+            resetNodeStates(node.left);
+            resetNodeStates(node.right);
+        }
+
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // --- Interactive Operations Implementation ---
+
+        // 1. INSERT OPERATION
+        async function handleInsert() {
+            if (isAnimating) return;
+            const input = document.getElementById('node-value');
+            const val = parseInt(input.value, 10);
+            if (isNaN(val)) {
+                logMessage("Please enter a valid numeric value.");
+                return;
+            }
+
+            switchTab('insert');
+            setControlsDisabled(true);
+            updateStatusBadge("INSERTING...");
+            resetNodeStates();
+            drawTree();
+
+            logMessage(`Starting insertion of value [${val}]`);
+            highlightCodeLine(1);
+            await sleep(animationDelay);
+
+            if (!bst.root) {
+                highlightCodeLine(2);
+                await sleep(animationDelay);
+                highlightCodeLine(3);
+                bst.root = new BSTNode(val);
+                bst.root.state = 'found';
+                recalculateNodePositions();
+                drawTree();
+                logMessage(`Inserted [${val}] as the Root node.`);
+                await sleep(animationDelay);
+            } else {
+                let curr = bst.root;
+                while (curr) {
+                    curr.state = 'visiting';
+                    drawTree();
+
+                    highlightCodeLine(5);
+                    if (val < curr.value) {
+                        showComparisonBadge(`${val} < ${curr.value} → GO LEFT`);
+                        logMessage(`Compare: ${val} < ${curr.value}. Moving to left subtree.`);
+                        await sleep(animationDelay);
+
+                        if (!curr.left) {
+                            highlightCodeLine(6);
+                            showComparisonBadge(`INSERT ${val} ON LEFT`);
+                            curr.left = new BSTNode(val);
+                            recalculateNodePositions();
+                            curr.left.state = 'found';
+                            drawTree();
+                            logMessage(`Inserted value [${val}] to the left of node [${curr.value}].`);
+                            await sleep(animationDelay);
+                            break;
+                        } else {
+                            curr.state = 'normal';
+                            curr = curr.left;
+                        }
+                    } else if (val > curr.value) {
+                        highlightCodeLine(7);
+                        showComparisonBadge(`${val} > ${curr.value} → GO RIGHT`);
+                        logMessage(`Compare: ${val} > ${curr.value}. Moving to right subtree.`);
+                        await sleep(animationDelay);
+
+                        if (!curr.right) {
+                            highlightCodeLine(8);
+                            showComparisonBadge(`INSERT ${val} ON RIGHT`);
+                            curr.right = new BSTNode(val);
+                            recalculateNodePositions();
+                            curr.right.state = 'found';
+                            drawTree();
+                            logMessage(`Inserted value [${val}] to the right of node [${curr.value}].`);
+                            await sleep(animationDelay);
+                            break;
+                        } else {
+                            curr.state = 'normal';
+                            curr = curr.right;
+                        }
+                    } else {
+                        showComparisonBadge(`${val} === ${curr.value} → DUPLICATE`);
+                        logMessage(`Value [${val}] already exists in BST. Duplicates ignored.`);
+                        curr.state = 'found';
+                        drawTree();
+                        await sleep(animationDelay);
+                        break;
+                    }
+                }
+            }
+
+            hideComparisonBadge();
+            resetNodeStates();
+            drawTree();
+            highlightCodeLine(null);
+            updateStatusBadge("IDLE");
+            setControlsDisabled(false);
+            input.value = '';
+        }
+
+        // 2. SEARCH OPERATION
+        async function handleSearch() {
+            if (isAnimating) return;
+            const input = document.getElementById('node-value');
+            const val = parseInt(input.value, 10);
+            if (isNaN(val)) {
+                logMessage("Please enter a valid numeric value to search.");
+                return;
+            }
+
+            switchTab('search');
+            setControlsDisabled(true);
+            updateStatusBadge("SEARCHING...");
+            resetNodeStates();
+            drawTree();
+
+            logMessage(`Searching for value [${val}]...`);
+            highlightCodeLine(1);
+            await sleep(animationDelay);
+
+            let curr = bst.root;
+            let found = false;
+
+            while (curr) {
+                curr.state = 'visiting';
+                drawTree();
+
+                highlightCodeLine(3);
+                if (curr.value === val) {
+                    curr.state = 'found';
+                    drawTree();
+                    showComparisonBadge(`FOUND VALUE ${val}!`);
+                    logMessage(`SUCCESS: Value [${val}] found in BST!`);
+                    highlightCodeLine(3);
+                    found = true;
+                    await sleep(animationDelay * 1.5);
+                    break;
+                }
+
+                highlightCodeLine(4);
+                if (val < curr.value) {
+                    showComparisonBadge(`${val} < ${curr.value} → GO LEFT`);
+                    logMessage(`Compare: ${val} < ${curr.value}. Searching left child.`);
+                    await sleep(animationDelay);
+                    highlightCodeLine(5);
+                    curr.state = 'normal';
+                    curr = curr.left;
+                } else {
+                    highlightCodeLine(6);
+                    showComparisonBadge(`${val} > ${curr.value} → GO RIGHT`);
+                    logMessage(`Compare: ${val} > ${curr.value}. Searching right child.`);
+                    await sleep(animationDelay);
+                    highlightCodeLine(7);
+                    curr.state = 'normal';
+                    curr = curr.right;
+                }
+            }
+
+            if (!found) {
+                highlightCodeLine(2);
+                showComparisonBadge(`VALUE ${val} NOT FOUND`);
+                logMessage(`RESULT: Value [${val}] does not exist in BST.`);
+                await sleep(animationDelay * 1.5);
+            }
+
+            hideComparisonBadge();
+            resetNodeStates();
+            drawTree();
+            highlightCodeLine(null);
+            updateStatusBadge("IDLE");
+            setControlsDisabled(false);
+        }
+
+        // 3. DELETE OPERATION
+        async function handleDelete() {
+            if (isAnimating) return;
+            const input = document.getElementById('node-value');
+            const val = parseInt(input.value, 10);
+            if (isNaN(val)) {
+                logMessage("Please enter a valid numeric value to delete.");
+                return;
+            }
+
+            switchTab('delete');
+            setControlsDisabled(true);
+            updateStatusBadge("DELETING...");
+            resetNodeStates();
+            drawTree();
+
+            logMessage(`Initiating deletion for node [${val}]...`);
+            highlightCodeLine(1);
+            await sleep(animationDelay);
+
+            bst.root = await deleteNodeAnimated(bst.root, val);
+
+            recalculateNodePositions();
+            resetNodeStates();
+            drawTree();
+            hideComparisonBadge();
+            highlightCodeLine(null);
+            updateStatusBadge("IDLE");
+            setControlsDisabled(false);
+            input.value = '';
+        }
+
+        async function deleteNodeAnimated(node, value) {
+            if (!node) {
+                highlightCodeLine(2);
+                showComparisonBadge(`NODE ${value} NOT FOUND`);
+                logMessage(`Deletion failed: Value [${value}] not found.`);
+                await sleep(animationDelay);
+                return null;
+            }
+
+            node.state = 'visiting';
+            drawTree();
+
+            highlightCodeLine(3);
+            if (value < node.value) {
+                showComparisonBadge(`${value} < ${node.value} → GO LEFT`);
+                logMessage(`Compare: ${value} < ${node.value}. Moving left.`);
+                await sleep(animationDelay);
+                highlightCodeLine(4);
+                node.state = 'normal';
+                node.left = await deleteNodeAnimated(node.left, value);
+                return node;
+            } else if (value > node.value) {
+                highlightCodeLine(5);
+                showComparisonBadge(`${value} > ${node.value} → GO RIGHT`);
+                logMessage(`Compare: ${value} > ${node.value}. Moving right.`);
+                await sleep(animationDelay);
+                highlightCodeLine(6);
+                node.state = 'normal';
+                node.right = await deleteNodeAnimated(node.right, value);
+                return node;
+            } else {
+                // Found Target Node
+                highlightCodeLine(7);
+                node.state = 'target';
+                drawTree();
+                showComparisonBadge(`TARGET NODE [${value}] FOUND`);
+                logMessage(`Found target node [${value}] to delete.`);
+                await sleep(animationDelay * 1.2);
+
+                // Case 1: Leaf Node
+                if (!node.left && !node.right) {
+                    highlightCodeLine(8);
+                    showComparisonBadge(`CASE 1: LEAF NODE REMOVAL`);
+                    logMessage(`Deleting Leaf Node [${node.value}] (0 children).`);
+                    await sleep(animationDelay * 1.5);
+                    return null;
+                }
+
+                // Case 2: Single Child (Right child only)
+                if (!node.left) {
+                    highlightCodeLine(9);
+                    showComparisonBadge(`CASE 2: 1-CHILD (RIGHT SUCCESSOR)`);
+                    logMessage(`Node [${node.value}] has 1 right child. Replacing with child.`);
+                    await sleep(animationDelay * 1.5);
+                    return node.right;
+                }
+
+                // Case 2: Single Child (Left child only)
+                if (!node.right) {
+                    highlightCodeLine(10);
+                    showComparisonBadge(`CASE 2: 1-CHILD (LEFT SUCCESSOR)`);
+                    logMessage(`Node [${node.value}] has 1 left child. Replacing with child.`);
+                    await sleep(animationDelay * 1.5);
+                    return node.left;
+                }
+
+                // Case 3: Two Children Node
+                highlightCodeLine(11);
+                showComparisonBadge(`CASE 3: TWO CHILDREN NODE`);
+                logMessage(`Node [${node.value}] has 2 children. Finding In-Order Successor (min in right subtree)...`);
+                await sleep(animationDelay);
+
+                // Find Min in Right Subtree
+                let successor = node.right;
+                while (successor.left) {
+                    successor = successor.left;
+                }
+
+                successor.state = 'visiting';
+                drawTree();
+                showComparisonBadge(`SUCCESSOR FOUND: [${successor.value}]`);
+                logMessage(`In-Order Successor is [${successor.value}]. Swapping values...`);
+                await sleep(animationDelay * 1.5);
+
+                highlightCodeLine(12);
+                node.value = successor.value;
+                drawTree();
+                await sleep(animationDelay);
+
+                highlightCodeLine(13);
+                logMessage(`Recursively deleting original successor node [${successor.value}] from right subtree.`);
+                node.right = await deleteNodeAnimated(node.right, successor.value);
+                return node;
+            }
+        }
+
+        // --- Utility Actions ---
+        function handleClear() {
+            if (isAnimating) return;
+            bst.root = null;
+            drawTree();
+            logMessage("Tree cleared.");
+        }
+
+        function handleGenerateRandom() {
+            if (isAnimating) return;
+            bst.root = null;
+            const count = Math.floor(Math.random() * 4) + 6; // 6 to 9 nodes
+            const values = new Set();
+            while (values.size < count) {
+                values.add(Math.floor(Math.random() * 90) + 5);
+            }
+            values.forEach(val => rawInsert(bst, val));
+            recalculateNodePositions();
+            resetNodeStates();
+            drawTree();
+            logMessage(`Generated new random tree with ${count} nodes.`);
+        }
+    </script>
+</body>
+</html>
