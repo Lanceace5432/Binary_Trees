@@ -1481,6 +1481,16 @@
             executionSteps = [];
             currentStepIndex = -1;
 
+            // Reset cached draw parameters and custom root snapshot from previous traversals/operations
+            lastDrawParams = { activeVal: null, stateClass: 'normal', activeEdgeFrom: null, activeEdgeTo: null, branchDir: null, customRoot: null };
+
+            // Hide any lingering traversal sequence banner
+            const banner = document.getElementById('traversalBanner');
+            if (banner) banner.classList.add('hidden');
+
+            const resultText = document.getElementById('traversalResultText');
+            if (resultText) resultText.textContent = '';
+
             const nodeCount = Math.floor(Math.random() * 6) + 4; // Guaranteed 4 to 9 nodes (never empty)
             const mode = Math.floor(Math.random() * 5); 
             const generatedValues = new Set();
