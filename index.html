@@ -4,341 +4,648 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Binary Search Tree Visualizer</title>
-    <!-- Tailwind CSS for utility styling -->
+    <!-- Google Fonts for Retro Pixel Aesthetics & Clean Code Representation -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for Pixel Art font -->
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
-
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkwood: '#5C3826',
+                        medwood: '#8B5738',
+                        lightwood: '#B9824D',
+                        goldaccent: '#E2B474',
+                        parchment: '#E8D5B7',
+                        lightcream: '#F5E8CC',
+                        darktext: '#3A2118',
+                        highlightgold: '#F6D65C',
+                        successgreen: '#78A65A',
+                        errorred: '#B95B4B',
+                        leafgreen: '#4E7837',
+                        purpleaccent: '#A855F7',
+                    },
+                    fontFamily: {
+                        pixel: ['"Press Start 2P"', 'monospace'],
+                        vt: ['"VT323"', 'monospace'],
+                        code: ['"Fira Code"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* Pixel-art styling theme token overrides */
-        :root {
-            --pixel-bg: #f4e4bc;
-            --pixel-bg-dark: #e5cd94;
-            --pixel-border-dark: #5c3818;
-            --pixel-border-light: #b0824e;
-            --pixel-accent-gold: #e6a817;
-            --pixel-btn-green: #5a8738;
-            --pixel-btn-green-hover: #486f2b;
-            --pixel-btn-red: #ab3c2d;
-            --pixel-btn-red-hover: #882c1f;
-            --pixel-btn-blue: #3b759e;
-            --pixel-btn-blue-hover: #2c597a;
-            --pixel-text-dark: #2a1a08;
+        /* Pixel-Art Render Rules & Custom Retro Components */
+        * {
+            image-rendering: pixelated;
+            user-select: none;
+            box-sizing: border-box;
         }
 
         body {
+            background-color: #25160E;
+            background-image: 
+                radial-gradient(#4a3121 15%, transparent 16%),
+                radial-gradient(#3a2316 15%, transparent 16%);
+            background-size: 28px 28px;
+            background-position: 0 0, 14px 14px;
+            color: #3A2118;
             font-family: 'VT323', monospace;
-            background-color: #2b1f17;
-            color: var(--pixel-text-dark);
-            image-rendering: pixelated;
         }
 
-        .font-pixel-heading {
-            font-family: 'Press Start 2P', cursive;
+        /* Wooden Panel Frames */
+        .pixel-box-wood {
+            background-color: #8B5738;
+            border: 4px solid #3A2118;
+            box-shadow: inset -4px -4px 0px 0px #5C3826, inset 4px 4px 0px 0px #E2B474;
         }
 
-        /* Pixelated Frame / Box styling */
-        .pixel-panel {
-            background-color: var(--pixel-bg);
-            border: 4px solid var(--pixel-border-dark);
-            box-shadow: 
-                inset -4px -4px 0px 0px #c2a770,
-                inset 4px 4px 0px 0px #fff4d4,
-                0px 6px 0px 0px #1a1008;
-            position: relative;
+        .pixel-box-parchment {
+            background-color: #E8D5B7;
+            border: 4px solid #3A2118;
+            box-shadow: inset -3px -3px 0px 0px #C9B28F, inset 3px 3px 0px 0px #F5E8CC;
         }
 
-        .pixel-panel-header {
-            background-color: #3b2310;
-            color: #fce8a6;
-            border-bottom: 4px solid var(--pixel-border-dark);
+        .pixel-box-dark {
+            background-color: #2C1A12;
+            border: 3px solid #3A2118;
+            box-shadow: inset 3px 3px 0px 0px #1A0E08;
         }
 
-        .pixel-inset {
-            background-color: #e5cd94;
-            border: 3px solid #8c5d2e;
-            box-shadow: inset 3px 3px 0px #38210c, inset -3px -3px 0px #f8e8c8;
-        }
-
-        .pixel-code-bg {
-            background-color: #231b15;
-            color: #d1c2a5;
-            border: 3px solid #5c3818;
-            box-shadow: inset 3px 3px 0px #120d09;
-        }
-
-        /* Buttons */
+        /* Stardew Inventory Style Buttons */
         .pixel-btn {
-            font-family: 'VT323', monospace;
-            font-size: 1.25rem;
-            color: #ffffff;
-            text-shadow: 1px 1px 0px #000;
-            border: 3px solid #1a1008;
-            box-shadow: inset -3px -3px 0px rgba(0,0,0,0.4), inset 3px 3px 0px rgba(255,255,255,0.3);
-            transition: all 0.05s ease;
-            position: relative;
-            top: 0;
-            user-select: none;
+            background-color: #B9824D;
+            border: 3px solid #3A2118;
+            box-shadow: inset -3px -3px 0px #5C3826, inset 3px 3px 0px #E2B474;
+            transition: all 0.05s ease-in-out;
+            color: #3A2118;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            text-transform: uppercase;
         }
 
-        .pixel-btn:active {
-            top: 3px;
-            box-shadow: inset 3px 3px 0px rgba(0,0,0,0.6);
+        .pixel-btn:hover:not(:disabled) {
+            background-color: #E2B474;
+            cursor: pointer;
+            transform: translateY(-1px);
         }
 
-        .pixel-btn-green { background-color: var(--pixel-btn-green); }
-        .pixel-btn-green:hover { background-color: var(--pixel-btn-green-hover); }
-
-        .pixel-btn-red { background-color: var(--pixel-btn-red); }
-        .pixel-btn-red:hover { background-color: var(--pixel-btn-red-hover); }
-
-        .pixel-btn-blue { background-color: var(--pixel-btn-blue); }
-        .pixel-btn-blue:hover { background-color: var(--pixel-btn-blue-hover); }
-
-        .pixel-btn-gold { background-color: var(--pixel-accent-gold); color: #2b1f17; text-shadow: none; font-weight: bold; }
-        .pixel-btn-gold:hover { background-color: #cb920e; }
+        .pixel-btn:active:not(:disabled) {
+            box-shadow: inset 3px 3px 0px #5C3826, inset -3px -3px 0px #E2B474;
+            transform: translateY(2px);
+        }
 
         .pixel-btn:disabled {
-            background-color: #7a7067 !important;
-            opacity: 0.6;
+            opacity: 0.4;
             cursor: not-allowed;
-            top: 0 !important;
+            filter: grayscale(0.8);
         }
 
-        /* Code Line Highlighting */
-        .code-line {
-            padding: 2px 8px;
-            border-left: 4px solid transparent;
-            font-family: monospace;
-            font-size: 0.95rem;
-            white-space: pre;
-            line-height: 1.35;
+        .pixel-btn-green {
+            background-color: #78A65A;
+            box-shadow: inset -3px -3px 0px #4E7837, inset 3px 3px 0px #A2D482;
+            color: #1A330A;
+        }
+        .pixel-btn-green:hover:not(:disabled) { background-color: #8CBF6C; }
+
+        .pixel-btn-gold {
+            background-color: #E2B474;
+            box-shadow: inset -3px -3px 0px #B9824D, inset 3px 3px 0px #F5E8CC;
+            color: #3A2118;
+        }
+        .pixel-btn-gold:hover:not(:disabled) { background-color: #F6D65C; }
+
+        .pixel-btn-blue {
+            background-color: #3B72A4;
+            box-shadow: inset -3px -3px 0px #21476A, inset 3px 3px 0px #6AA4D9;
+            color: #FFFFFF;
+        }
+        .pixel-btn-blue:hover:not(:disabled) { background-color: #4A85BB; }
+
+        .pixel-btn-red {
+            background-color: #B95B4B;
+            box-shadow: inset -3px -3px 0px #7A352A, inset 3px 3px 0px #E58677;
+            color: #FFFFFF;
+        }
+        .pixel-btn-red:hover:not(:disabled) { background-color: #CF6E5E; }
+
+        .pixel-btn-active {
+            background-color: #F6D65C !important;
+            box-shadow: inset 3px 3px 0px #B9824D, inset -3px -3px 0px #FFFFFF !important;
         }
 
-        .code-line.active {
-            background-color: #5c4213;
-            border-left-color: #facc15;
-            color: #fffde0;
-            font-weight: bold;
+        /* Canvas Texture & Corner Bracket Decorations */
+        .corner-bracket {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .corner-tl { top: 0; left: 0; border-top: 4px solid #3A2118; border-left: 4px solid #3A2118; background: #E2B474; }
+        .corner-tr { top: 0; right: 0; border-top: 4px solid #3A2118; border-right: 4px solid #3A2118; background: #E2B474; }
+        .corner-bl { bottom: 0; left: 0; border-bottom: 4px solid #3A2118; border-left: 4px solid #3A2118; background: #E2B474; }
+        .corner-br { bottom: 0; right: 0; border-bottom: 4px solid #3A2118; border-right: 4px solid #3A2118; background: #E2B474; }
+
+        /* Depth Guide Lines & Legend Pill */
+        .depth-badge {
+            background: #5C3826;
+            color: #E2B474;
+            border: 2px solid #3A2118;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            padding: 2px 4px;
+            border-radius: 2px;
+            box-shadow: 1px 1px 0px #3A2118;
         }
 
-        /* Custom Scrollbar */
+        .legend-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            padding: 2px 6px;
+            border: 2px solid #3A2118;
+            background: #E8D5B7;
+            color: #3A2118;
+            box-shadow: 1px 1px 0px #3A2118;
+        }
+
+        /* Input Controls */
+        .pixel-input {
+            background-color: #F5E8CC;
+            border: 3px solid #3A2118;
+            box-shadow: inset 3px 3px 0px #C9B28F;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 11px;
+            color: #3A2118;
+            outline: none;
+        }
+        .pixel-input:focus {
+            background-color: #FFFFFF;
+            border-color: #5C3826;
+        }
+
+        /* Retro Scrollbar */
         ::-webkit-scrollbar {
             width: 10px;
             height: 10px;
         }
         ::-webkit-scrollbar-track {
-            background: #231b15;
+            background: #4A2E1F;
+            border: 2px solid #3A2118;
         }
         ::-webkit-scrollbar-thumb {
-            background: #8c5d2e;
-            border: 2px solid #231b15;
+            background: #B9824D;
+            border: 2px solid #3A2118;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #b0824e;
+            background: #E2B474;
         }
 
-        /* Dynamic Canvas Container */
-        #canvas-container {
-            width: 100%;
-            height: 100%;
-            min-height: 420px;
-            position: relative;
-            overflow: hidden;
-            background-color: #ebd39e;
-            background-image: radial-gradient(#d3b87d 15%, transparent 16%);
-            background-size: 16px 16px;
+        /* Synchronized Code Highlight Line */
+        .code-line {
+            padding: 3px 8px;
+            white-space: pre;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #E8D5B7;
+            transition: background-color 0.15s ease;
+        }
+        .code-line.active {
+            background-color: #F6D65C !important;
+            color: #3A2118 !important;
+            font-weight: 600;
+            border-left: 5px solid #5C3826;
+        }
+
+        /* SVG Node Styling */
+        .node-group {
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .node-circle {
+            transition: all 0.3s ease;
+            stroke-width: 3px;
+        }
+        .node-circle.normal { fill: #B9824D; stroke: #3A2118; }
+        .node-circle.active { fill: #F6D65C; stroke: #3A2118; stroke-width: 4px; filter: drop-shadow(0 0 8px #F6D65C); }
+        .node-circle.found { fill: #78A65A; stroke: #3A2118; stroke-width: 4px; filter: drop-shadow(0 0 8px #78A65A); }
+        .node-circle.successor { fill: #A855F7; stroke: #3A2118; stroke-width: 4px; filter: drop-shadow(0 0 8px #A855F7); }
+        .node-circle.delete { fill: #B95B4B; stroke: #3A2118; stroke-width: 4px; filter: drop-shadow(0 0 8px #B95B4B); }
+        .node-circle.visited { fill: #3B82F6; stroke: #3A2118; stroke-width: 4px; filter: drop-shadow(0 0 8px #3B82F6); }
+        
+        /* Carved Double Wooden Branch Lines */
+        .tree-edge-outer {
+            stroke: #3A2118;
+            stroke-width: 8px;
+            stroke-linecap: round;
+        }
+        .tree-edge-inner {
+            stroke: #8B5738;
+            stroke-width: 4px;
+            stroke-linecap: round;
+            transition: all 0.3s ease;
+        }
+        .tree-edge-inner.highlight {
+            stroke: #F6D65C;
+            stroke-width: 5px;
+            filter: drop-shadow(0 0 6px #F6D65C);
+        }
+
+        @keyframes pixel-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .animate-bounce-pixel {
+            animation: pixel-bounce 1.2s infinite steps(2);
         }
     </style>
 </head>
-<body class="min-h-screen p-2 md:p-4 flex flex-col">
+<body class="min-h-screen flex flex-col p-2 md:p-3 text-lg leading-snug">
 
-    <!-- Header Banner -->
-    <header class="pixel-panel mb-4 p-3 flex flex-wrap justify-between items-center bg-[#422915]">
+    <!-- TOP HEADER / NAV BAR -->
+    <header class="pixel-box-wood p-3 mb-3 flex flex-col md:flex-row justify-between items-center gap-3 flex-shrink-0">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-[#e6a817] border-2 border-black flex items-center justify-center font-pixel-heading text-xs text-black">
-                BST
+            <div class="w-11 h-11 bg-darkwood border-2 border-darktext flex items-center justify-center shadow-inner">
+                <!-- Gold Pixel Tree Diagram Icon (Screenshot 2026-11-06 025410.png) -->
+                <svg class="w-8 h-8" viewBox="0 0 20 20" shape-rendering="crispEdges">
+                    <rect x="7" y="1" width="6" height="5" rx="1" fill="#F6D65C" stroke="#3A2118" stroke-width="1"/>
+                    <rect x="9.5" y="6" width="1" height="3" fill="#F6D65C"/>
+                    <rect x="3.5" y="8.5" width="13" height="1.5" fill="#F6D65C"/>
+                    <rect x="3.5" y="10" width="1" height="2" fill="#F6D65C"/>
+                    <rect x="9.5" y="10" width="1" height="2" fill="#F6D65C"/>
+                    <rect x="15.5" y="10" width="1" height="2" fill="#F6D65C"/>
+                    <rect x="1" y="12" width="6" height="5" rx="1" fill="#F6D65C" stroke="#3A2118" stroke-width="1"/>
+                    <rect x="7" y="12" width="6" height="5" rx="1" fill="#F6D65C" stroke="#3A2118" stroke-width="1"/>
+                    <rect x="13" y="12" width="6" height="5" rx="1" fill="#F6D65C" stroke="#3A2118" stroke-width="1"/>
+                </svg>
             </div>
-            <h1 class="font-pixel-heading text-lg sm:text-xl text-[#fce8a6] tracking-wide">
-                Binary Search Tree Visualizer
-            </h1>
+            <div>
+                <h1 class="font-pixel text-xs md:text-base text-goldaccent tracking-wide drop-shadow-[0_2px_0_#3A2118]">
+                    BINARY SEARCH TREE VISUALIZER
+                </h1>
+                <p class="text-parchment text-xs md:text-sm tracking-wider font-vt">Interactive Data Structure Engine</p>
+            </div>
         </div>
-        <div class="text-sm text-[#d1b88e] flex items-center gap-2 mt-2 sm:mt-0">
-            <span class="inline-block w-3 h-3 bg-green-600 rounded-full border border-black"></span>
-            Algorithm Execution Engine
+
+        <div class="flex flex-wrap items-center gap-2">
+            <div id="treeStatusBadge" class="pixel-box-parchment px-3 py-1.5 text-[10px] font-pixel text-darkwood">
+                STATUS: EMPTY TREE
+            </div>
+            <button onclick="toggleModal('eduModal')" class="pixel-btn px-3 py-2 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M2 2h5v12H2V2zm7 0h5v12H9V2zm-7 1h5v1H2V3zm7 0h5v1H9V3z"/></svg>
+                <span>BST Guide</span>
+            </button>
+            <button onclick="toggleModal('aboutModal')" class="pixel-btn px-3 py-2 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M7 2h2v2H7V2zm0 4h2v8H7V6z"/></svg>
+                <span>Info</span>
+            </button>
         </div>
     </header>
 
-    <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
-
-        <!-- Left Side Panel: Source Code & Trace Execution -->
-        <section class="lg:col-span-5 flex flex-col gap-3">
-            <div class="pixel-panel flex-1 flex flex-col min-h-[450px]">
-                <!-- Panel Header with Code Selection Tabs -->
-                <div class="pixel-panel-header px-4 py-2 flex items-center justify-between">
-                    <span class="font-pixel-heading text-xs">SOURCE CODE (JavaScript)</span>
-                    <div class="flex gap-1" id="code-tabs">
-                        <button onclick="switchTab('insert')" id="tab-insert" class="px-2 py-0.5 text-sm bg-[#5c3818] text-[#fce8a6] border border-[#8c5d2e] rounded-t font-bold">Insert</button>
-                        <button onclick="switchTab('search')" id="tab-search" class="px-2 py-0.5 text-sm bg-[#2b1f17] text-[#aa9578] border border-[#5c3818] rounded-t">Search</button>
-                        <button onclick="switchTab('delete')" id="tab-delete" class="px-2 py-0.5 text-sm bg-[#2b1f17] text-[#aa9578] border border-[#5c3818] rounded-t">Delete</button>
-                    </div>
-                </div>
-
-                <!-- Code Block Viewport -->
-                <div class="p-3 flex-1 flex flex-col">
-                    <div class="pixel-code-bg flex-1 overflow-y-auto p-2 text-xs sm:text-sm font-mono leading-relaxed relative" id="code-container">
-                        <!-- Dynamic code lines inserted by JavaScript -->
-                    </div>
-                </div>
-
-                <!-- Execution Step Log Box -->
-                <div class="p-3 pt-0">
-                    <div class="text-xs font-pixel-heading text-[#5c3818] mb-1">EXECUTION LOG:</div>
-                    <div id="log-box" class="pixel-inset p-2 h-24 overflow-y-auto text-sm text-[#2a1a08] font-mono leading-tight">
-                        <div class="text-[#6b5235] italic">> Visualizer ready. Select an operation below...</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Right Side Panel: Visualization Canvas & Interactive Controls -->
-        <section class="lg:col-span-7 flex flex-col gap-3">
+    <!-- MAIN SYMMETRIC WORKSPACE GRID -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-grow max-w-[1700px] w-full mx-auto">
+        
+        <!-- LEFT COLUMN (40% Width = lg:col-span-5): Code & Statistics & Logs -->
+        <div class="lg:col-span-5 flex flex-col gap-3 flex-grow">
             
-            <!-- Controls Toolbar Panel -->
-            <div class="pixel-panel p-3">
-                <div class="flex flex-wrap gap-2 items-center justify-between">
+            <!-- CODE EXECUTION PANEL -->
+            <div class="pixel-box-parchment flex-grow flex flex-col p-3 min-h-[360px]">
+                <div class="flex justify-between items-center mb-2 pb-2 border-b-2 border-darkwood flex-shrink-0">
+                    <div class="flex items-center gap-2">
+                        <!-- Curled Parchment Scroll Icon (Screenshot 2026-11-06 025418.png) -->
+                        <svg class="w-4 h-4" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                            <path d="M1 3h3v3H1V3z" fill="#5C3826"/>
+                            <path d="M4 1h9a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z" fill="#5C3826"/>
+                            <path d="M4 12h10a2 2 0 0 1 2 2v0a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2z" fill="#3A2118"/>
+                        </svg>
+                        <span class="font-pixel text-[11px] font-bold text-darkwood">SYNCHRONIZED ALGORITHM CODE (C)</span>
+                    </div>
+                </div>
+
+                <!-- Synchronized Line Code Container -->
+                <div id="codeDisplay" class="pixel-box-dark flex-grow overflow-auto p-2 font-code text-xs leading-relaxed min-h-[220px]">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Decision Badge / Left-Right Branch Indicator -->
+                <div id="decisionBadge" class="mt-2 pixel-box-wood p-2 text-center text-[10px] font-pixel text-highlightgold flex items-center justify-center gap-2 flex-shrink-0">
+                    <span class="text-parchment">STEP ACTION:</span>
+                    <span id="decisionText" class="text-white font-bold">READY</span>
+                </div>
+            </div>
+
+            <!-- STATISTICS HUD (INVENTORY GRID LAYOUT) -->
+            <div class="pixel-box-wood p-2.5">
+                <div class="font-pixel text-[10px] text-parchment mb-2 text-center flex items-center justify-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 fill-current text-goldaccent" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M1 13h4V7H1v6zm5 0h4V3H6v10zm5 0h4V9h-4v4z"/></svg>
+                    <span>BST INVENTORY STATISTICS</span>
+                </div>
+                <div class="grid grid-cols-4 gap-1.5 text-center">
+                    <div class="pixel-box-parchment p-1.5">
+                        <div class="font-pixel text-[8px] text-darkwood">ROOT</div>
+                        <div id="statRoot" class="font-pixel text-xs text-darkwood font-bold mt-0.5">N/A</div>
+                    </div>
+                    <div class="pixel-box-parchment p-1.5">
+                        <div class="font-pixel text-[8px] text-darkwood">NODES</div>
+                        <div id="statNodes" class="font-pixel text-xs text-darkwood font-bold mt-0.5">0</div>
+                    </div>
+                    <div class="pixel-box-parchment p-1.5">
+                        <div class="font-pixel text-[8px] text-darkwood">HEIGHT</div>
+                        <div id="statHeight" class="font-pixel text-xs text-darkwood font-bold mt-0.5">0</div>
+                    </div>
+                    <div class="pixel-box-parchment p-1.5">
+                        <div class="font-pixel text-[8px] text-darkwood">LEAVES</div>
+                        <div id="statLeaves" class="font-pixel text-xs text-darkwood font-bold mt-0.5">0</div>
+                    </div>
+                    <div class="pixel-box-parchment p-1.5">
+                        <div class="font-pixel text-[8px] text-darkwood">MIN</div>
+                        <div id="statMin" class="font-pixel text-xs text-darkwood font-bold mt-0.5">N/A</div>
+                    </div>
+                    <div class="pixel-box-parchment p-1.5">
+                        <div class="font-pixel text-[8px] text-darkwood">MAX</div>
+                        <div id="statMax" class="font-pixel text-xs text-darkwood font-bold mt-0.5">N/A</div>
+                    </div>
+                    <div class="pixel-box-parchment p-1.5">
+                        <div class="font-pixel text-[8px] text-darkwood">AVG TIME</div>
+                        <div class="font-pixel text-[10px] text-leafgreen font-bold mt-0.5">O(log N)</div>
+                    </div>
+                    <div class="pixel-box-parchment p-1.5">
+                        <div class="font-pixel text-[8px] text-darkwood">WORST</div>
+                        <div class="font-pixel text-[10px] text-errorred font-bold mt-0.5">O(N)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OPERATION HISTORY LOG -->
+            <div class="pixel-box-parchment p-2.5 h-32 flex flex-col">
+                <div class="font-pixel text-[9px] text-darkwood mb-1 font-bold flex justify-between items-center">
+                    <div class="flex items-center gap-1.5">
+                        <!-- Parchment Scroll Icon -->
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                            <path d="M1 3h3v3H1V3z" fill="#5C3826"/>
+                            <path d="M4 1h9a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z" fill="#5C3826"/>
+                        </svg>
+                        <span>ACTION HISTORY LOG</span>
+                    </div>
+                    <span class="text-[8px] opacity-75">RECENT FIRST</span>
+                </div>
+                <div class="pixel-box-dark flex-grow p-1.5 overflow-y-auto">
+                    <ul id="historyLog" class="text-xs font-vt text-parchment space-y-0.5">
+                        <li>• System initialized. Ready for BST operations.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN (60% Width = lg:col-span-7): Controls, Visualization Canvas, Dialogue -->
+        <div class="lg:col-span-7 flex flex-col gap-3 flex-grow">
+            
+            <!-- CONTROL DECK (MATCHING SCREENSHOT 2026-11-06 025403.png) -->
+            <div class="pixel-box-wood p-3 flex flex-col gap-2.5">
+                <!-- Operations Row -->
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 flex-grow max-w-xs">
+                        <input type="text" id="nodeInput" placeholder="Val or 10,20,30" class="pixel-input px-2.5 py-2 w-full" />
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <!-- Insert Button (+) -->
+                        <button onclick="handleInsert()" class="pixel-btn pixel-btn-green px-2.5 py-2 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M7 2h2v5h5v2H9v5H7V9H2V7h5V2z"/></svg>
+                            <span>Insert</span>
+                        </button>
+                        <!-- Search Button (Magnifying Glass) -->
+                        <button onclick="handleSearch()" class="pixel-btn pixel-btn-gold px-2.5 py-2 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M3 2h5v2H3V2zm5 2h2v4H8V4zm-5 4h5v2H3V8zm-2-4h2v4H1V4zm9 6h2v2h-2v-2zm2 2h2v2h-2v-2zm2 2h2v2h-2v-2z"/></svg>
+                            <span>Search</span>
+                        </button>
+                        <!-- Delete Button (Trash Can) -->
+                        <button onclick="handleDelete()" class="pixel-btn pixel-btn-red px-2.5 py-2 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M6 1h4v1H6V1zM3 3h10v2H3V3zm1 3h8v9H4V6zm2 2v5h1.5V8H6zm3 0v5h1.5V8H9z"/></svg>
+                            <span>Delete</span>
+                        </button>
+                        <!-- Random Button (Tilted Pair of Dice) -->
+                        <button onclick="generateRandomTree()" class="pixel-btn pixel-btn-blue px-2.5 py-2 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M3 1h5v5H3V1zm1.5 1.5h1v1h-1v-1zm2.5 2h1v1h-1v-1zm-4 0h1v1h-1v-1zm5 3.5h5v5H8V8zm1.5 1.5h1v1h-1v-1zm2 0h1v1h-1v-1zm-1 1h1v1h-1v-1zm-1 1h1v1h-1v-1zm2 0h1v1h-1v-1z"/></svg>
+                            <span>Random</span>
+                        </button>
+                        <!-- Clear Button (Undo Counter-clockwise Arrow) -->
+                        <button onclick="confirmClearTree()" class="pixel-btn px-2 py-2 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M4 2h6v2H4V2zM2 4h2v2H2V4zm-2 2h2v4H0V6zm2 4h2v2H2v-2zm2 2h8v-2H4v2zm8-2h2V6h-2v4zM4 0h2v4H4V0z"/></svg>
+                            <span>Clear</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Traversals Row -->
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-darkwood">
+                    <span class="font-pixel text-[10px] text-parchment">TRAVERSAL MODES:</span>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="handleTraversal('inorder')" class="pixel-btn px-2 py-1.5">In-Order</button>
+                        <button onclick="handleTraversal('preorder')" class="pixel-btn px-2 py-1.5">Pre-Order</button>
+                        <button onclick="handleTraversal('postorder')" class="pixel-btn px-2 py-1.5">Post-Order</button>
+                        <button onclick="handleTraversal('levelorder')" class="pixel-btn px-2 py-1.5">Level-Order</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXECUTION CONTROLLER & SPEED SLIDER -->
+            <div class="pixel-box-wood p-2.5 flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5">
+                    <button id="btnResetStep" onclick="resetPlayback()" class="pixel-btn px-2 py-1.5" title="Reset Step">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M2 2h2v12H2V2zm3 6l9-6v12L5 8z"/></svg>
+                    </button>
+                    <button id="btnPrevStep" onclick="stepBack()" class="pixel-btn px-2 py-1.5 flex items-center gap-1" title="Previous Step">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M12 2L4 8l8 6V2z"/></svg>
+                        <span>Step</span>
+                    </button>
+                    <button id="btnPlayPause" onclick="togglePlayPause()" class="pixel-btn pixel-btn-green px-3 py-1.5 flex items-center gap-1" title="Play/Pause">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M4 2l10 6-10 6V2z"/></svg>
+                        <span>Play</span>
+                    </button>
+                    <button id="btnNextStep" onclick="stepForward()" class="pixel-btn px-2 py-1.5 flex items-center gap-1" title="Next Step">
+                        <span>Step</span>
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M4 2l8 6-8 6V2z"/></svg>
+                    </button>
+                    <button id="btnEndStep" onclick="finishPlayback()" class="pixel-btn px-2 py-1.5" title="Skip to End">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M2 2l9 6-9 6V2zm10 0h2v12h-2V2z"/></svg>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2 bg-darkwood px-3 py-1 border-2 border-darktext flex-grow max-w-xs justify-end">
+                    <span class="font-pixel text-[9px] text-parchment">SPEED:</span>
+                    <input type="range" id="speedSlider" min="200" max="1800" step="100" value="800" class="w-24 accent-highlightgold cursor-pointer" onchange="updateSpeed()" />
+                    <span id="speedValue" class="font-pixel text-[9px] text-highlightgold w-10 text-right">800ms</span>
+                </div>
+            </div>
+
+            <!-- SVG VISUALIZATION CANVAS -->
+            <div class="pixel-box-parchment flex-grow relative min-h-[420px] flex flex-col p-2 overflow-hidden">
+                <div class="flex justify-between items-center mb-1 px-1 flex-shrink-0">
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4" viewBox="0 0 20 20" shape-rendering="crispEdges">
+                            <rect x="7" y="1" width="6" height="5" rx="1" fill="#5C3826" stroke="#3A2118" stroke-width="1"/>
+                            <rect x="9.5" y="6" width="1" height="3" fill="#5C3826"/>
+                            <rect x="3.5" y="8.5" width="13" height="1.5" fill="#5C3826"/>
+                            <rect x="1" y="12" width="6" height="5" rx="1" fill="#5C3826" stroke="#3A2118" stroke-width="1"/>
+                            <rect x="13" y="12" width="6" height="5" rx="1" fill="#5C3826" stroke="#3A2118" stroke-width="1"/>
+                        </svg>
+                        <span class="font-pixel text-[10px] text-darkwood font-bold">DYNAMIC BST CANVAS</span>
+                    </div>
                     
-                    <!-- Input & Operation Buttons -->
-                    <div class="flex flex-wrap items-center gap-2">
-                        <div class="flex items-center">
-                            <label for="node-value" class="sr-only">Node Value</label>
-                            <input type="number" id="node-value" placeholder="Val (0-99)" min="0" max="99" 
-                                class="w-24 p-2 pixel-inset font-bold text-center text-lg text-[#2a1a08] outline-none focus:ring-2 focus:ring-[#8c5d2e]" 
-                                onkeydown="if(event.key === 'Enter') handleInsert()"/>
-                        </div>
-
-                        <button id="btn-insert" onclick="handleInsert()" class="pixel-btn pixel-btn-green px-3 py-1.5">
-                            + Insert
-                        </button>
-                        <button id="btn-search" onclick="handleSearch()" class="pixel-btn pixel-btn-blue px-3 py-1.5">
-                            ? Search
-                        </button>
-                        <button id="btn-delete" onclick="handleDelete()" class="pixel-btn pixel-btn-red px-3 py-1.5">
-                            - Delete
-                        </button>
+                    <!-- Canvas Compact Legend -->
+                    <div class="hidden sm:flex items-center gap-1.5">
+                        <div class="legend-pill"><span class="w-2 h-2 rounded-full bg-[#B9824D] border border-black"></span>NORMAL</div>
+                        <div class="legend-pill"><span class="w-2 h-2 rounded-full bg-[#F6D65C] border border-black"></span>ACTIVE</div>
+                        <div class="legend-pill"><span class="w-2 h-2 rounded-full bg-[#78A65A] border border-black"></span>FOUND</div>
+                        <div class="legend-pill"><span class="w-2 h-2 rounded-full bg-[#A855F7] border border-black"></span>SUCC</div>
+                        <div class="legend-pill"><span class="w-2 h-2 rounded-full bg-[#B95B4B] border border-black"></span>DEL</div>
                     </div>
-
-                    <!-- Preset & Utility Actions -->
-                    <div class="flex items-center gap-2">
-                        <button id="btn-random" onclick="handleGenerateRandom()" class="pixel-btn pixel-btn-gold px-3 py-1.5 text-xs">
-                            Random Tree
-                        </button>
-                        <button id="btn-clear" onclick="handleClear()" class="pixel-btn bg-[#6e6359] hover:bg-[#574e46] px-3 py-1.5 text-xs">
-                            Clear
-                        </button>
-                    </div>
+                    <span id="traversalResultText" class="font-pixel text-[10px] text-leafgreen font-bold"></span>
                 </div>
+                
+                <!-- SVG Container & Wooden Decorative Corners -->
+                <div class="w-full flex-grow relative bg-[#F5E8CC] border-4 border-darkwood rounded shadow-inner overflow-hidden" id="canvasWrapper">
+                    <!-- Metal Rivet Wood Corner Brackets -->
+                    <div class="corner-bracket corner-tl"></div>
+                    <div class="corner-bracket corner-tr"></div>
+                    <div class="corner-bracket corner-bl"></div>
+                    <div class="corner-bracket corner-br"></div>
 
-                <!-- Animation Delay Control Slider -->
-                <div class="mt-3 pt-2 border-t border-[#c2a770] flex items-center justify-between text-xs sm:text-sm font-bold text-[#4a3219]">
-                    <div class="flex items-center gap-2">
-                        <span>Speed:</span>
-                        <input type="range" id="speed-range" min="200" max="1800" step="100" value="900" 
-                               class="accent-[#5c3818] cursor-pointer" onchange="updateSpeedLabel()"/>
-                        <span id="speed-label" class="w-12 text-center">900ms</span>
-                    </div>
-                    <div id="status-badge" class="px-2 py-0.5 pixel-inset bg-[#f3e3bc] text-[#5c3818] font-mono text-xs">
-                        STATUS: IDLE
+                    <!-- SVG Workspace -->
+                    <svg id="bstSvg" class="w-full h-full min-w-[650px] min-h-[400px]"></svg>
+                </div>
+            </div>
+
+            <!-- STARDEW DIALOGUE WINDOW (STEP EXPLANATIONS) -->
+            <div class="pixel-box-wood p-3 flex gap-3 items-center">
+                <!-- NPC Portrait Frame -->
+                <div class="w-14 h-14 bg-parchment border-2 border-darktext flex-shrink-0 flex items-center justify-center relative overflow-hidden shadow-md">
+                    <!-- Pixel Wizard Hat SVG Icon -->
+                    <svg class="w-10 h-10 animate-bounce-pixel" viewBox="0 0 20 20" shape-rendering="crispEdges">
+                        <rect x="2" y="15" width="16" height="3" fill="#5C3826" stroke="#3A2118" stroke-width="1"/>
+                        <polygon points="10,1 4,15 16,15" fill="#8B5738"/>
+                        <rect x="5.5" y="13" width="9" height="2" fill="#E2B474"/>
+                        <rect x="9.5" y="7" width="2" height="2" fill="#F6D65C"/>
+                        <rect x="6.5" y="10" width="1.5" height="1.5" fill="#F6D65C"/>
+                    </svg>
+                </div>
+                <!-- Dialogue Bubble -->
+                <div class="pixel-box-parchment flex-grow p-2.5 min-h-[64px] flex flex-col justify-center">
+                    <div class="font-pixel text-[9px] text-darkwood font-bold mb-0.5">WIZARD ACADEMIC TUTOR:</div>
+                    <div id="dialogueText" class="text-darktext text-base leading-tight font-vt">
+                        Welcome to the Binary Search Tree Visualizer! Enter a value above and click **Insert** to begin building your tree.
                     </div>
                 </div>
             </div>
 
-            <!-- Visualization Canvas Box -->
-            <div class="pixel-panel flex-1 flex flex-col min-h-[420px]">
-                <div class="pixel-panel-header px-4 py-2 flex justify-between items-center">
-                    <span class="font-pixel-heading text-xs">BST CANVAS VISUALIZATION</span>
-                    <div class="text-xs text-[#d1b88e] flex items-center gap-3">
-                        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#3b759e] border border-black inline-block"></span> Normal</span>
-                        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#facc15] border border-black inline-block"></span> Visiting</span>
-                        <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#22c55e] border border-black inline-block"></span> Target</span>
+        </div>
+    </main>
+
+    <!-- GUIDES & MODALS -->
+    <!-- EDUCATIONAL MODAL -->
+    <div id="eduModal" class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="pixel-box-parchment max-w-2xl w-full max-h-[85vh] flex flex-col p-4 relative">
+            <div class="flex justify-between items-center border-b-2 border-darkwood pb-2 mb-3">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 fill-current text-darkwood" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M2 2h5v12H2V2zm7 0h5v12H9V2zm-7 1h5v1H2V3zm7 0h5v1H9V3z"/></svg>
+                    <h2 class="font-pixel text-xs text-darkwood">BINARY SEARCH TREE EDUCATIONAL GUIDE</h2>
+                </div>
+                <button onclick="toggleModal('eduModal')" class="pixel-btn pixel-btn-red px-2 py-1">X</button>
+            </div>
+            <div class="overflow-y-auto text-darktext text-base font-vt space-y-3 leading-relaxed pr-1">
+                <div class="pixel-box-wood p-3 text-parchment">
+                    <h3 class="font-pixel text-[10px] text-highlightgold mb-1">What is a Binary Search Tree (BST) in C?</h3>
+                    <p>In C, a Binary Search Tree is constructed using a self-referential structure and memory pointers:</p>
+                    <div class="bg-darkwood p-2 font-code text-xs text-parchment border border-darktext my-2">
+                        struct Node {<br>
+                        &nbsp;&nbsp;int data;<br>
+                        &nbsp;&nbsp;struct Node *left;<br>
+                        &nbsp;&nbsp;struct Node *right;<br>
+                        };
                     </div>
+                    <ul class="list-disc pl-5 mt-1 space-y-1 text-sm">
+                        <li>The <strong>left pointer</strong> points to subtrees with data <em>less than</em> the current node.</li>
+                        <li>The <strong>right pointer</strong> points to subtrees with data <em>greater than</em> the current node.</li>
+                        <li>Subtree pointers are set to <code>NULL</code> when no children exist.</li>
+                    </ul>
                 </div>
 
-                <!-- Canvas Rendering Area -->
-                <div class="flex-1 p-2 relative flex flex-col">
-                    <div id="canvas-container" class="flex-1 rounded pixel-inset relative">
-                        <canvas id="bst-canvas" class="w-full h-full block"></canvas>
-                        
-                        <!-- Floating Comparison Status Popup Overlay -->
-                        <div id="comparison-badge" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 pixel-panel px-4 py-2 bg-[#fef3c7] border-2 border-[#b45309] text-[#78350f] font-pixel-heading text-xs sm:text-sm shadow-lg text-center z-10 animate-bounce">
-                            COMPARISON STATUS
-                        </div>
-                    </div>
+                <div class="pixel-box-parchment p-3 border border-darkwood">
+                    <h3 class="font-pixel text-[10px] text-darkwood mb-1">C Node Deletion Memory Cases</h3>
+                    <ol class="list-decimal pl-5 space-y-1 text-sm">
+                        <li><strong>Case 1 (Leaf Node):</strong> Target has NULL children. Sever pointer and <code>free()</code> node memory.</li>
+                        <li><strong>Case 2 (Single Child):</strong> Target has one valid pointer. Replace node with child pointer and free target.</li>
+                        <li><strong>Case 3 (Two Children):</strong> Locate In-Order Successor (smallest node in right subtree), copy <code>data</code>, then recursively delete successor node.</li>
+                    </ol>
                 </div>
             </div>
-
-        </section>
+        </div>
     </div>
 
-    <!-- Algorithm Code Snippets Data & Application Logic -->
-    <script>
-        // --- Code Snippets Definitions for Source Code Panel ---
-        const CODE_SNIPPETS = {
-            insert: [
-                { line: 1, text: "function insert(node, value) {" },
-                { line: 2, text: "    if (node === null) {" },
-                { line: 3, text: "        return new Node(value);" },
-                { line: 4, text: "    }" },
-                { line: 5, text: "    if (value < node.value) {" },
-                { line: 6, text: "        node.left = insert(node.left, value);" },
-                { line: 7, text: "    } else if (value > node.value) {" },
-                { line: 8, text: "        node.right = insert(node.right, value);" },
-                { line: 9, text: "    }" },
-                { line: 10, text: "    return node;" },
-                { line: 11, text: "}" }
-            ],
-            search: [
-                { line: 1, text: "function search(node, value) {" },
-                { line: 2, text: "    if (node === null) return null;" },
-                { line: 3, text: "    if (node.value === value) return node;" },
-                { line: 4, text: "    if (value < node.value) {" },
-                { line: 5, text: "        return search(node.left, value);" },
-                { line: 6, text: "    } else {" },
-                { line: 7, text: "        return search(node.right, value);" },
-                { line: 8, text: "    }" },
-                { line: 9, text: "}" }
-            ],
-            delete: [
-                { line: 1, text: "function deleteNode(node, value) {" },
-                { line: 2, text: "    if (node === null) return null;" },
-                { line: 3, text: "    if (value < node.value) {" },
-                { line: 4, text: "        node.left = deleteNode(node.left, value);" },
-                { line: 5, text: "    } else if (value > node.value) {" },
-                { line: 6, text: "        node.right = deleteNode(node.right, value);" },
-                { line: 7, text: "    } else { // Node found" },
-                { line: 8, text: "        if (!node.left && !node.right) return null; // Case 1: Leaf" },
-                { line: 9, text: "        if (!node.left) return node.right;          // Case 2: 1 child" },
-                { line: 10, text: "        if (!node.right) return node.left;         // Case 2: 1 child" },
-                { line: 11, text: "        let successor = getMin(node.right);        // Case 3: 2 children" },
-                { line: 12, text: "        node.value = successor.value;" },
-                { line: 13, text: "        node.right = deleteNode(node.right, successor.value);" },
-                { line: 14, text: "    }" },
-                { line: 15, text: "    return node;" },
-                { line: 16, text: "}" }
-            ]
-        };
+    <!-- ABOUT MODAL -->
+    <div id="aboutModal" class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="pixel-box-parchment max-w-md w-full p-4">
+            <div class="flex justify-between items-center border-b-2 border-darkwood pb-2 mb-3">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 fill-current text-darkwood" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M7 2h2v2H7V2zm0 4h2v8H7V6z"/></svg>
+                    <h2 class="font-pixel text-xs text-darkwood">ABOUT VISUALIZER</h2>
+                </div>
+                <button onclick="toggleModal('aboutModal')" class="pixel-btn pixel-btn-red px-2 py-1">X</button>
+            </div>
+            <p class="text-darktext font-vt mb-3 text-base">
+                An interactive computer science visualizer mapping binary search tree operations directly to pure C code lines step-by-step.
+            </p>
+            <div class="pixel-box-wood p-3 text-parchment font-pixel text-[9px] space-y-2">
+                <div class="flex items-center gap-2">
+                    <svg class="w-3.5 h-3.5 fill-current text-goldaccent" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm-4 4a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm8 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg>
+                    <span>Palette: Warm Wood & Pixel Gold</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <svg class="w-3.5 h-3.5 fill-current text-goldaccent" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M2 2h12v9H2V2zm-1 10h14v2H1v-2z"/></svg>
+                    <span>Language: C Algorithm Implementation</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <svg class="w-3.5 h-3.5 fill-current text-goldaccent" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M9 1L3 9h5l-1 6 7-8h-5l1-6z"/></svg>
+                    <span>Rendering: Dynamic SVG Graphics</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // --- BST Data Structure ---
+    <!-- CLEAR CONFIRMATION MODAL -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="pixel-box-parchment max-w-sm w-full p-4 text-center">
+            <div class="flex justify-center mb-2">
+                <svg class="w-8 h-8 fill-current text-darkwood" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M4 2h6v2H4V2zM2 4h2v2H2V4zm-2 2h2v4H0V6zm2 4h2v2H2v-2zm2 2h8v-2H4v2zm8-2h2V6h-2v4zM4 0h2v4H4V0z"/></svg>
+            </div>
+            <h3 class="font-pixel text-xs text-darkwood mb-2">Clear Entire Tree?</h3>
+            <p class="text-darktext font-vt mb-4">Are you sure you want to remove all nodes?</p>
+            <div class="flex justify-center gap-3">
+                <button onclick="clearTree()" class="pixel-btn pixel-btn-red px-4 py-2">Yes, Clear</button>
+                <button onclick="toggleModal('confirmModal')" class="pixel-btn px-4 py-2">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT BST CORE & ENGINE -->
+    <script>
+        /* ==========================================================================
+           1. BST DATA STRUCTURE & CLASSES
+           ========================================================================== */
         class BSTNode {
             constructor(value) {
                 this.value = value;
                 this.left = null;
                 this.right = null;
-                // Visualization attributes
                 this.x = 0;
                 this.y = 0;
-                this.state = 'normal'; // 'normal', 'visiting', 'found', 'target'
+                this.depth = 0;
             }
         }
 
@@ -346,590 +653,1155 @@
             constructor() {
                 this.root = null;
             }
+
+            insert(value) {
+                const newNode = new BSTNode(value);
+                if (!this.root) {
+                    this.root = newNode;
+                    return true;
+                }
+                let curr = this.root;
+                while (true) {
+                    if (value === curr.value) return false; // Avoid duplicates
+                    if (value < curr.value) {
+                        if (!curr.left) {
+                            curr.left = newNode;
+                            return true;
+                        }
+                        curr = curr.left;
+                    } else {
+                        if (!curr.right) {
+                            curr.right = newNode;
+                            return true;
+                        }
+                        curr = curr.right;
+                    }
+                }
+            }
+
+            contains(node, value) {
+                if (!node) return false;
+                if (node.value === value) return true;
+                if (value < node.value) return this.contains(node.left, value);
+                return this.contains(node.right, value);
+            }
+
+            getMin(node = this.root) {
+                if (!node) return null;
+                while (node.left) node = node.left;
+                return node.value;
+            }
+
+            getMax(node = this.root) {
+                if (!node) return null;
+                while (node.right) node = node.right;
+                return node.value;
+            }
+
+            getHeight(node = this.root) {
+                if (!node) return 0;
+                return 1 + Math.max(this.getHeight(node.left), this.getHeight(node.right));
+            }
+
+            getNodeCount(node = this.root) {
+                if (!node) return 0;
+                return 1 + this.getNodeCount(node.left) + this.getNodeCount(node.right);
+            }
+
+            getLeafCount(node = this.root) {
+                if (!node) return 0;
+                if (!node.left && !node.right) return 1;
+                return this.getLeafCount(node.left) + this.getLeafCount(node.right);
+            }
         }
 
-        // --- Application State ---
-        const bst = new BinarySearchTree();
-        let currentTab = 'insert';
-        let isAnimating = false;
-        let animationDelay = 900;
-
-        // Canvas Setup
-        const canvas = document.getElementById('bst-canvas');
-        const ctx = canvas.getContext('2d');
-        const canvasContainer = document.getElementById('canvas-container');
-
-        // --- Initialization ---
-        window.onload = () => {
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-            renderCodeSnippet('insert');
-            updateSpeedLabel();
-
-            // Seed initial balanced tree for demonstration
-            const initialValues = [50, 25, 75, 12, 37, 62, 87];
-            initialValues.forEach(val => rawInsert(bst, val));
-            recalculateNodePositions();
-            drawTree();
-            logMessage("Initialized visualizer with sample Binary Search Tree.");
+        /* ==========================================================================
+           2. SYNCHRONIZED C CODE TEMPLATES
+           ========================================================================== */
+        const CODE_TEMPLATES = {
+            c: {
+                insert: [
+                    "struct Node* insert(struct Node* root, int val) {",
+                    "    if (root == NULL) return createNode(val);",
+                    "    if (val < root->data)",
+                    "        root->left = insert(root->left, val);",
+                    "    else if (val > root->data)",
+                    "        root->right = insert(root->right, val);",
+                    "    return root;",
+                    "}"
+                ],
+                search: [
+                    "struct Node* search(struct Node* root, int val) {",
+                    "    if (root == NULL || root->data == val)",
+                    "        return root;",
+                    "    if (val < root->data)",
+                    "        return search(root->left, val);",
+                    "    return search(root->right, val);",
+                    "}"
+                ],
+                delete: [
+                    "struct Node* deleteNode(struct Node* root, int val) {",
+                    "    if (root == NULL) return root;",
+                    "    if (val < root->data) root->left = deleteNode(root->left, val);",
+                    "    else if (val > root->data) root->right = deleteNode(root->right, val);",
+                    "    else {",
+                    "        if (root->left == NULL) { struct Node* temp = root->right; free(root); return temp; }",
+                    "        else if (root->right == NULL) { struct Node* temp = root->left; free(root); return temp; }",
+                    "        struct Node* temp = minValueNode(root->right);",
+                    "        root->data = temp->data;",
+                    "        root->right = deleteNode(root->right, temp->data);",
+                    "    }",
+                    "    return root;",
+                    "}"
+                ],
+                traversal: [
+                    "void traverse(struct Node* root) {",
+                    "    if (root == NULL) return;",
+                    "    /* Process Left Child Subtree */",
+                    "    printf(\"%d \", root->data); /* Visit Node */",
+                    "    /* Process Right Child Subtree */",
+                    "}"
+                ]
+            }
         };
 
-        function resizeCanvas() {
-            canvas.width = canvasContainer.clientWidth;
-            canvas.height = canvasContainer.clientHeight;
-            recalculateNodePositions();
-            drawTree();
+        /* ==========================================================================
+           3. GLOBAL STATE VARIABLES
+           ========================================================================== */
+        const bst = new BinarySearchTree();
+        let executionSteps = [];
+        let currentStepIndex = -1;
+        let playbackTimer = null;
+        let isPlaying = false;
+        let playbackSpeed = 800;
+        let currentOperationType = 'insert';
+
+        /* ==========================================================================
+           4. VISUALIZATION RENDERER (RETRO 3D WOODEN NODE & BRANCH ENGINE)
+           ========================================================================== */
+        function calculatePositions(node, depth = 0, leftBoundary = 0, rightBoundary = 1000) {
+            if (!node) return;
+            node.depth = depth;
+            node.x = (leftBoundary + rightBoundary) / 2;
+            node.y = 50 + depth * 70;
+
+            const width = rightBoundary - leftBoundary;
+            if (node.left) calculatePositions(node.left, depth + 1, leftBoundary, leftBoundary + width / 2);
+            if (node.right) calculatePositions(node.right, depth + 1, leftBoundary + width / 2, rightBoundary);
         }
 
-        function updateSpeedLabel() {
-            const val = document.getElementById('speed-range').value;
-            animationDelay = parseInt(val, 10);
-            document.getElementById('speed-label').innerText = `${val}ms`;
+        function cloneTree(node) {
+            if (!node) return null;
+            const newNode = new BSTNode(node.value);
+            newNode.x = node.x;
+            newNode.y = node.y;
+            newNode.depth = node.depth;
+            newNode.left = cloneTree(node.left);
+            newNode.right = cloneTree(node.right);
+            return newNode;
         }
 
-        // --- Code Panel Tab Switcher ---
-        function switchTab(tabName) {
-            currentTab = tabName;
-            ['insert', 'search', 'delete'].forEach(t => {
-                const btn = document.getElementById(`tab-${t}`);
-                if (t === tabName) {
-                    btn.className = "px-2 py-0.5 text-sm bg-[#5c3818] text-[#fce8a6] border border-[#8c5d2e] rounded-t font-bold";
-                } else {
-                    btn.className = "px-2 py-0.5 text-sm bg-[#2b1f17] text-[#aa9578] border border-[#5c3818] rounded-t";
-                }
-            });
-            renderCodeSnippet(tabName);
-        }
+        function drawTree(activeVal = null, stateClass = 'active', activeEdgeFrom = null, activeEdgeTo = null, branchDir = null, customRoot = null) {
+            const svg = document.getElementById('bstSvg');
+            if (!svg) return;
+            svg.innerHTML = '';
 
-        function renderCodeSnippet(snippetKey) {
-            const container = document.getElementById('code-container');
-            container.innerHTML = '';
-            const lines = CODE_SNIPPETS[snippetKey] || [];
-            lines.forEach(item => {
-                const div = document.createElement('div');
-                div.id = `code-line-${item.line}`;
-                div.className = 'code-line';
-                div.innerText = `${item.line.toString().padStart(2, ' ')}  ${item.text}`;
-                container.appendChild(div);
-            });
-        }
+            const rootToDraw = customRoot !== null ? customRoot : bst.root;
+            if (!rootToDraw) return;
 
-        function highlightCodeLine(lineNum) {
-            document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
-            if (lineNum) {
-                const target = document.getElementById(`code-line-${lineNum}`);
-                if (target) {
-                    target.classList.add('active');
-                    target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-                }
+            const containerWidth = Math.max(svg.clientWidth || 650, 650);
+            calculatePositions(rootToDraw, 0, 40, containerWidth - 40);
+
+            // SVG Filters for 3D Wood Coin Shadow
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            defs.innerHTML = `
+                <filter id="nodeShadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="2" dy="4" stdDeviation="1" flood-color="#1A0E08" flood-opacity="0.7"/>
+                </filter>
+                <linearGradient id="woodGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#D49A5B"/>
+                    <stop offset="50%" stop-color="#B9824D"/>
+                    <stop offset="100%" stop-color="#8B5738"/>
+                </linearGradient>
+            `;
+            svg.appendChild(defs);
+
+            // Draw Depth Guide Lines
+            const maxDepth = Math.min(bst.getHeight(rootToDraw), 5);
+            for (let d = 0; d < maxDepth; d++) {
+                const yPos = 50 + d * 70;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', '0');
+                line.setAttribute('y1', yPos);
+                line.setAttribute('x2', '100%');
+                line.setAttribute('y2', yPos);
+                line.setAttribute('stroke', '#3A2118');
+                line.setAttribute('stroke-dasharray', '3 4');
+                line.setAttribute('stroke-opacity', '0.25');
+                svg.appendChild(line);
+
+                const badge = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                badge.setAttribute('x', '12');
+                badge.setAttribute('y', yPos + 4);
+                badge.setAttribute('class', 'font-pixel text-[8px] fill-[#8B5738]');
+                badge.textContent = d === 0 ? 'LVL 0 ROOT' : `LVL ${d}`;
+                svg.appendChild(badge);
             }
-        }
 
-        // --- UI Logging & Status Display ---
-        function logMessage(msg) {
-            const logBox = document.getElementById('log-box');
-            const entry = document.createElement('div');
-            entry.className = "mb-1 border-b border-[#c2a770]/30 pb-0.5";
-            entry.innerText = `> ${msg}`;
-            logBox.appendChild(entry);
-            logBox.scrollTop = logBox.scrollHeight;
-        }
-
-        function updateStatusBadge(text) {
-            document.getElementById('status-badge').innerText = `STATUS: ${text}`;
-        }
-
-        function showComparisonBadge(text) {
-            const badge = document.getElementById('comparison-badge');
-            badge.innerText = text;
-            badge.classList.remove('hidden');
-        }
-
-        function hideComparisonBadge() {
-            document.getElementById('comparison-badge').classList.add('hidden');
-        }
-
-        function setControlsDisabled(disabled) {
-            isAnimating = disabled;
-            const buttons = ['btn-insert', 'btn-search', 'btn-delete', 'btn-random', 'btn-clear'];
-            buttons.forEach(id => {
-                const btn = document.getElementById(id);
-                if (btn) btn.disabled = disabled;
-            });
-            document.getElementById('node-value').disabled = disabled;
-        }
-
-        // --- Helper: Synchronous Non-Animated Tree Insert ---
-        function rawInsert(tree, value) {
-            const newNode = new BSTNode(value);
-            if (!tree.root) {
-                tree.root = newNode;
-                return;
-            }
-            let curr = tree.root;
-            while (true) {
-                if (value < curr.value) {
-                    if (!curr.left) {
-                        curr.left = newNode;
-                        break;
-                    }
-                    curr = curr.left;
-                } else if (value > curr.value) {
-                    if (!curr.right) {
-                        curr.right = newNode;
-                        break;
-                    }
-                    curr = curr.right;
-                } else {
-                    break; // Ignore duplicates
-                }
-            }
-        }
-
-        // --- Node Layout & Coordinate Calculation ---
-        function recalculateNodePositions() {
-            if (!bst.root) return;
-            const width = canvas.width;
-            const startY = 50;
-            const levelHeight = 65;
-
-            function layout(node, depth, minX, maxX) {
+            // Draw Connector Edges
+            function drawEdges(node) {
                 if (!node) return;
-                const x = (minX + maxX) / 2;
-                const y = startY + depth * levelHeight;
-                node.x = x;
-                node.y = y;
+                
+                ['left', 'right'].forEach(childKey => {
+                    const child = node[childKey];
+                    if (child) {
+                        const outerLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        outerLine.setAttribute('x1', node.x);
+                        outerLine.setAttribute('y1', node.y);
+                        outerLine.setAttribute('x2', child.x);
+                        outerLine.setAttribute('y2', child.y);
+                        outerLine.setAttribute('class', 'tree-edge-outer');
+                        svg.appendChild(outerLine);
 
-                layout(node.left, depth + 1, minX, x);
-                layout(node.right, depth + 1, x, maxX);
-            }
+                        const isHighlighted = (activeEdgeFrom === node.value && activeEdgeTo === child.value);
+                        const innerLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        innerLine.setAttribute('x1', node.x);
+                        innerLine.setAttribute('y1', node.y);
+                        innerLine.setAttribute('x2', child.x);
+                        innerLine.setAttribute('y2', child.y);
+                        innerLine.setAttribute('class', `tree-edge-inner ${isHighlighted ? 'highlight' : ''}`);
+                        svg.appendChild(innerLine);
 
-            layout(bst.root, 0, 20, width - 20);
-        }
+                        // Branch Comparison Direction Badge (< LEFT or RIGHT >)
+                        if (isHighlighted && branchDir) {
+                            const midX = (node.x + child.x) / 2;
+                            const midY = (node.y + child.y) / 2;
 
-        // --- Canvas Rendering Engine ---
-        function drawTree() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (!bst.root) return;
+                            const pillGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                            rect.setAttribute('x', midX - 24);
+                            rect.setAttribute('y', midY - 9);
+                            rect.setAttribute('width', 48);
+                            rect.setAttribute('height', 18);
+                            rect.setAttribute('rx', 3);
+                            rect.setAttribute('fill', '#F6D65C');
+                            rect.setAttribute('stroke', '#3A2118');
+                            rect.setAttribute('stroke-width', '2');
 
-            // Draw Edges First
-            drawEdges(bst.root);
+                            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                            text.setAttribute('x', midX);
+                            text.setAttribute('y', midY + 4);
+                            text.setAttribute('text-anchor', 'middle');
+                            text.setAttribute('class', 'font-pixel text-[8px] fill-[#3A2118] font-bold');
+                            text.textContent = branchDir;
 
-            // Draw Nodes
-            drawNodes(bst.root);
-        }
-
-        function drawEdges(node) {
-            if (!node) return;
-
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = '#5c3818';
-
-            if (node.left) {
-                ctx.beginPath();
-                ctx.moveTo(node.x, node.y);
-                ctx.lineTo(node.left.x, node.left.y);
-                ctx.stroke();
-                drawEdges(node.left);
-            }
-
-            if (node.right) {
-                ctx.beginPath();
-                ctx.moveTo(node.x, node.y);
-                ctx.lineTo(node.right.x, node.right.y);
-                ctx.stroke();
-                drawEdges(node.right);
-            }
-        }
-
-        function drawNodes(node) {
-            if (!node) return;
-
-            const radius = 20;
-
-            // Determine Fill Style based on animation state
-            let bgColor = '#3b759e';  // Normal default blue
-            let strokeColor = '#1a364a';
-            let textColor = '#ffffff';
-
-            if (node.state === 'visiting') {
-                bgColor = '#e6a817';      // Gold highlight
-                strokeColor = '#5c3818';
-                textColor = '#2b1f17';
-            } else if (node.state === 'found') {
-                bgColor = '#22c55e';      // Green success
-                strokeColor = '#14532d';
-                textColor = '#ffffff';
-            } else if (node.state === 'target') {
-                bgColor = '#ef4444';      // Red target
-                strokeColor = '#7f1d1d';
-                textColor = '#ffffff';
-            }
-
-            // Draw Shadow
-            ctx.beginPath();
-            ctx.arc(node.x + 2, node.y + 3, radius, 0, 2 * Math.PI);
-            ctx.fillStyle = 'rgba(0,0,0,0.2)';
-            ctx.fill();
-
-            // Draw Main Node Circle
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
-            ctx.fillStyle = bgColor;
-            ctx.fill();
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = strokeColor;
-            ctx.stroke();
-
-            // Inner Pixel Accent Ring
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, radius - 4, 0, 2 * Math.PI);
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-            ctx.stroke();
-
-            // Node Value Text
-            ctx.font = 'bold 18px "VT323", monospace';
-            ctx.fillStyle = textColor;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(node.value, node.x, node.y + 1);
-
-            // Recursively draw children
-            drawNodes(node.left);
-            drawNodes(node.right);
-        }
-
-        function resetNodeStates(node = bst.root) {
-            if (!node) return;
-            node.state = 'normal';
-            resetNodeStates(node.left);
-            resetNodeStates(node.right);
-        }
-
-        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-        // --- Interactive Operations Implementation ---
-
-        // 1. INSERT OPERATION
-        async function handleInsert() {
-            if (isAnimating) return;
-            const input = document.getElementById('node-value');
-            const val = parseInt(input.value, 10);
-            if (isNaN(val)) {
-                logMessage("Please enter a valid numeric value.");
-                return;
-            }
-
-            switchTab('insert');
-            setControlsDisabled(true);
-            updateStatusBadge("INSERTING...");
-            resetNodeStates();
-            drawTree();
-
-            logMessage(`Starting insertion of value [${val}]`);
-            highlightCodeLine(1);
-            await sleep(animationDelay);
-
-            if (!bst.root) {
-                highlightCodeLine(2);
-                await sleep(animationDelay);
-                highlightCodeLine(3);
-                bst.root = new BSTNode(val);
-                bst.root.state = 'found';
-                recalculateNodePositions();
-                drawTree();
-                logMessage(`Inserted [${val}] as the Root node.`);
-                await sleep(animationDelay);
-            } else {
-                let curr = bst.root;
-                while (curr) {
-                    curr.state = 'visiting';
-                    drawTree();
-
-                    highlightCodeLine(5);
-                    if (val < curr.value) {
-                        showComparisonBadge(`${val} < ${curr.value} → GO LEFT`);
-                        logMessage(`Compare: ${val} < ${curr.value}. Moving to left subtree.`);
-                        await sleep(animationDelay);
-
-                        if (!curr.left) {
-                            highlightCodeLine(6);
-                            showComparisonBadge(`INSERT ${val} ON LEFT`);
-                            curr.left = new BSTNode(val);
-                            recalculateNodePositions();
-                            curr.left.state = 'found';
-                            drawTree();
-                            logMessage(`Inserted value [${val}] to the left of node [${curr.value}].`);
-                            await sleep(animationDelay);
-                            break;
-                        } else {
-                            curr.state = 'normal';
-                            curr = curr.left;
+                            pillGroup.appendChild(rect);
+                            pillGroup.appendChild(text);
+                            svg.appendChild(pillGroup);
                         }
-                    } else if (val > curr.value) {
-                        highlightCodeLine(7);
-                        showComparisonBadge(`${val} > ${curr.value} → GO RIGHT`);
-                        logMessage(`Compare: ${val} > ${curr.value}. Moving to right subtree.`);
-                        await sleep(animationDelay);
 
-                        if (!curr.right) {
-                            highlightCodeLine(8);
-                            showComparisonBadge(`INSERT ${val} ON RIGHT`);
-                            curr.right = new BSTNode(val);
-                            recalculateNodePositions();
-                            curr.right.state = 'found';
-                            drawTree();
-                            logMessage(`Inserted value [${val}] to the right of node [${curr.value}].`);
-                            await sleep(animationDelay);
-                            break;
-                        } else {
-                            curr.state = 'normal';
-                            curr = curr.right;
-                        }
-                    } else {
-                        showComparisonBadge(`${val} === ${curr.value} → DUPLICATE`);
-                        logMessage(`Value [${val}] already exists in BST. Duplicates ignored.`);
-                        curr.state = 'found';
-                        drawTree();
-                        await sleep(animationDelay);
-                        break;
+                        drawEdges(child);
                     }
-                }
+                });
             }
+            drawEdges(rootToDraw);
 
-            hideComparisonBadge();
-            resetNodeStates();
-            drawTree();
-            highlightCodeLine(null);
-            updateStatusBadge("IDLE");
-            setControlsDisabled(false);
-            input.value = '';
+            // Draw 3D Wooden Coin Nodes
+            function drawNodes(node) {
+                if (!node) return;
+
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.setAttribute('class', 'node-group');
+                g.setAttribute('transform', `translate(${node.x}, ${node.y})`);
+                g.setAttribute('filter', 'url(#nodeShadow)');
+
+                let currentClass = 'normal';
+                if (Array.isArray(activeVal)) {
+                    if (activeVal.includes(node.value)) currentClass = stateClass;
+                } else if (node.value === activeVal) {
+                    currentClass = stateClass;
+                }
+
+                // Node Base Outer Border
+                const outerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                outerCircle.setAttribute('r', '22');
+                outerCircle.setAttribute('class', `node-circle ${currentClass}`);
+                g.appendChild(outerCircle);
+
+                // Inner Wood Grain Texture Ring
+                const innerRing = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                innerRing.setAttribute('r', '17');
+                innerRing.setAttribute('fill', 'none');
+                innerRing.setAttribute('stroke', '#3A2118');
+                innerRing.setAttribute('stroke-width', '1');
+                innerRing.setAttribute('stroke-dasharray', '2 3');
+                innerRing.setAttribute('stroke-opacity', '0.4');
+                g.appendChild(innerRing);
+
+                // Node Value Text
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dy', '5');
+                text.setAttribute('class', 'font-pixel text-xs fill-[#F5E8CC] font-bold tracking-tight');
+                text.setAttribute('style', 'text-shadow: 1px 1px 0px #3A2118, -1px -1px 0px #3A2118, 1px -1px 0px #3A2118, -1px 1px 0px #3A2118;');
+                text.textContent = node.value;
+                g.appendChild(text);
+
+                svg.appendChild(g);
+
+                drawNodes(node.left);
+                drawNodes(node.right);
+            }
+            drawNodes(rootToDraw);
         }
 
-        // 2. SEARCH OPERATION
-        async function handleSearch() {
-            if (isAnimating) return;
-            const input = document.getElementById('node-value');
-            const val = parseInt(input.value, 10);
-            if (isNaN(val)) {
-                logMessage("Please enter a valid numeric value to search.");
-                return;
+        /* ==========================================================================
+           5. STEP GENERATION LOGIC (INSERTION, SEARCH, DELETION, TRAVERSALS)
+           ========================================================================== */
+        function generateInsertSteps(val) {
+            const steps = [];
+            currentOperationType = 'insert';
+            
+            let tempRoot = cloneTree(bst.root);
+            
+            if (!tempRoot) {
+                const newTree = new BinarySearchTree();
+                newTree.insert(val);
+                steps.push({
+                    line: 2,
+                    activeVal: val,
+                    stateClass: 'found',
+                    explanation: `Root node is NULL. Allocating node with value ${val}.`,
+                    decision: `NEW ROOT (${val})`,
+                    treeState: cloneTree(newTree.root)
+                });
+                return steps;
             }
 
-            switchTab('search');
-            setControlsDisabled(true);
-            updateStatusBadge("SEARCHING...");
-            resetNodeStates();
-            drawTree();
+            let curr = tempRoot;
+            let parent = null;
+            let edgeFrom = null;
 
-            logMessage(`Searching for value [${val}]...`);
-            highlightCodeLine(1);
-            await sleep(animationDelay);
-
-            let curr = bst.root;
-            let found = false;
+            steps.push({
+                line: 1,
+                activeVal: curr.value,
+                stateClass: 'active',
+                explanation: `Starting insertion traversal at root node (${curr.value}).`,
+                decision: `ROOT: ${curr.value}`,
+                treeState: cloneTree(tempRoot)
+            });
 
             while (curr) {
-                curr.state = 'visiting';
-                drawTree();
+                steps.push({
+                    line: 3,
+                    activeVal: curr.value,
+                    stateClass: 'active',
+                    explanation: `Comparing key ${val} with current node key ${curr.value}.`,
+                    decision: `${val} ${val < curr.value ? '<' : val > curr.value ? '>' : '=='} ${curr.value}`,
+                    treeState: cloneTree(tempRoot)
+                });
 
-                highlightCodeLine(3);
-                if (curr.value === val) {
-                    curr.state = 'found';
-                    drawTree();
-                    showComparisonBadge(`FOUND VALUE ${val}!`);
-                    logMessage(`SUCCESS: Value [${val}] found in BST!`);
-                    highlightCodeLine(3);
-                    found = true;
-                    await sleep(animationDelay * 1.5);
-                    break;
+                if (val === curr.value) {
+                    steps.push({
+                        line: 3,
+                        activeVal: curr.value,
+                        stateClass: 'delete',
+                        explanation: `Value ${val} already exists in BST! Duplicate insertion cancelled.`,
+                        decision: `DUPLICATE`,
+                        treeState: cloneTree(tempRoot)
+                    });
+                    return steps;
                 }
 
-                highlightCodeLine(4);
                 if (val < curr.value) {
-                    showComparisonBadge(`${val} < ${curr.value} → GO LEFT`);
-                    logMessage(`Compare: ${val} < ${curr.value}. Searching left child.`);
-                    await sleep(animationDelay);
-                    highlightCodeLine(5);
-                    curr.state = 'normal';
+                    edgeFrom = curr.value;
+                    steps.push({
+                        line: 4,
+                        activeVal: curr.value,
+                        stateClass: 'active',
+                        edgeFrom: edgeFrom,
+                        edgeTo: curr.left ? curr.left.value : null,
+                        branchDir: '< LEFT',
+                        explanation: `${val} < ${curr.value}. Traversing to LEFT child subtree.`,
+                        decision: `MOVE LEFT`,
+                        treeState: cloneTree(tempRoot)
+                    });
+
+                    if (!curr.left) {
+                        curr.left = new BSTNode(val);
+                        steps.push({
+                            line: 2,
+                            activeVal: val,
+                            stateClass: 'found',
+                            edgeFrom: edgeFrom,
+                            edgeTo: val,
+                            branchDir: '< LEFT',
+                            explanation: `Found NULL position! Allocated node (${val}) as LEFT child of ${curr.value}.`,
+                            decision: `INSERT LEFT`,
+                            treeState: cloneTree(tempRoot)
+                        });
+                        break;
+                    }
                     curr = curr.left;
                 } else {
-                    highlightCodeLine(6);
-                    showComparisonBadge(`${val} > ${curr.value} → GO RIGHT`);
-                    logMessage(`Compare: ${val} > ${curr.value}. Searching right child.`);
-                    await sleep(animationDelay);
-                    highlightCodeLine(7);
-                    curr.state = 'normal';
+                    edgeFrom = curr.value;
+                    steps.push({
+                        line: 6,
+                        activeVal: curr.value,
+                        stateClass: 'active',
+                        edgeFrom: edgeFrom,
+                        edgeTo: curr.right ? curr.right.value : null,
+                        branchDir: 'RIGHT >',
+                        explanation: `${val} > ${curr.value}. Traversing to RIGHT child subtree.`,
+                        decision: `MOVE RIGHT`,
+                        treeState: cloneTree(tempRoot)
+                    });
+
+                    if (!curr.right) {
+                        curr.right = new BSTNode(val);
+                        steps.push({
+                            line: 2,
+                            activeVal: val,
+                            stateClass: 'found',
+                            edgeFrom: edgeFrom,
+                            edgeTo: val,
+                            branchDir: 'RIGHT >',
+                            explanation: `Found NULL position! Allocated node (${val}) as RIGHT child of ${curr.value}.`,
+                            decision: `INSERT RIGHT`,
+                            treeState: cloneTree(tempRoot)
+                        });
+                        break;
+                    }
                     curr = curr.right;
                 }
             }
 
-            if (!found) {
-                highlightCodeLine(2);
-                showComparisonBadge(`VALUE ${val} NOT FOUND`);
-                logMessage(`RESULT: Value [${val}] does not exist in BST.`);
-                await sleep(animationDelay * 1.5);
-            }
+            steps.push({
+                line: 7,
+                activeVal: val,
+                stateClass: 'found',
+                explanation: `Insertion of value ${val} completed successfully!`,
+                decision: `DONE`,
+                treeState: cloneTree(tempRoot)
+            });
 
-            hideComparisonBadge();
-            resetNodeStates();
-            drawTree();
-            highlightCodeLine(null);
-            updateStatusBadge("IDLE");
-            setControlsDisabled(false);
+            return steps;
         }
 
-        // 3. DELETE OPERATION
-        async function handleDelete() {
-            if (isAnimating) return;
-            const input = document.getElementById('node-value');
-            const val = parseInt(input.value, 10);
-            if (isNaN(val)) {
-                logMessage("Please enter a valid numeric value to delete.");
-                return;
+        function generateSearchSteps(val) {
+            const steps = [];
+            currentOperationType = 'search';
+
+            if (!bst.root) {
+                steps.push({
+                    line: 2,
+                    activeVal: null,
+                    explanation: `Cannot search key ${val} because the tree is empty!`,
+                    decision: `EMPTY TREE`
+                });
+                return steps;
             }
 
-            switchTab('delete');
-            setControlsDisabled(true);
-            updateStatusBadge("DELETING...");
-            resetNodeStates();
-            drawTree();
+            let curr = bst.root;
+            steps.push({
+                line: 1,
+                activeVal: curr.value,
+                stateClass: 'active',
+                explanation: `Starting search query for key ${val} at root (${curr.value}).`,
+                decision: `SEARCH: ${val}`
+            });
 
-            logMessage(`Initiating deletion for node [${val}]...`);
-            highlightCodeLine(1);
-            await sleep(animationDelay);
+            while (curr) {
+                steps.push({
+                    line: 2,
+                    activeVal: curr.value,
+                    stateClass: 'active',
+                    explanation: `Evaluating node key ${curr.value} against query ${val}.`,
+                    decision: `${val} ${val === curr.value ? '==' : val < curr.value ? '<' : '>'} ${curr.value}`
+                });
 
-            bst.root = await deleteNodeAnimated(bst.root, val);
+                if (val === curr.value) {
+                    steps.push({
+                        line: 3,
+                        activeVal: curr.value,
+                        stateClass: 'found',
+                        explanation: `KEY MATCH FOUND! Node (${val}) exists in the Binary Search Tree.`,
+                        decision: `FOUND (${val})`
+                    });
+                    return steps;
+                }
 
-            recalculateNodePositions();
-            resetNodeStates();
-            drawTree();
-            hideComparisonBadge();
-            highlightCodeLine(null);
-            updateStatusBadge("IDLE");
-            setControlsDisabled(false);
-            input.value = '';
+                if (val < curr.value) {
+                    const edgeFrom = curr.value;
+                    const nextVal = curr.left ? curr.left.value : null;
+                    steps.push({
+                        line: 4,
+                        activeVal: curr.value,
+                        stateClass: 'active',
+                        edgeFrom: edgeFrom,
+                        edgeTo: nextVal,
+                        branchDir: '< LEFT',
+                        explanation: `${val} < ${curr.value}. Following LEFT branch.`,
+                        decision: `MOVE LEFT`
+                    });
+                    curr = curr.left;
+                } else {
+                    const edgeFrom = curr.value;
+                    const nextVal = curr.right ? curr.right.value : null;
+                    steps.push({
+                        line: 6,
+                        activeVal: curr.value,
+                        stateClass: 'active',
+                        edgeFrom: edgeFrom,
+                        edgeTo: nextVal,
+                        branchDir: 'RIGHT >',
+                        explanation: `${val} > ${curr.value}. Following RIGHT branch.`,
+                        decision: `MOVE RIGHT`
+                    });
+                    curr = curr.right;
+                }
+            }
+
+            steps.push({
+                line: 2,
+                activeVal: null,
+                stateClass: 'delete',
+                explanation: `Reached NULL node. Key ${val} does NOT exist in the tree!`,
+                decision: `NOT FOUND`
+            });
+
+            return steps;
         }
 
-        async function deleteNodeAnimated(node, value) {
-            if (!node) {
-                highlightCodeLine(2);
-                showComparisonBadge(`NODE ${value} NOT FOUND`);
-                logMessage(`Deletion failed: Value [${value}] not found.`);
-                await sleep(animationDelay);
-                return null;
+        function generateDeleteSteps(val) {
+            const steps = [];
+            currentOperationType = 'delete';
+
+            if (!bst.root) {
+                steps.push({
+                    line: 2,
+                    activeVal: null,
+                    explanation: `Cannot delete value ${val}. The tree is empty!`,
+                    decision: `EMPTY TREE`
+                });
+                return steps;
             }
 
-            node.state = 'visiting';
-            drawTree();
+            let tempRoot = cloneTree(bst.root);
 
-            highlightCodeLine(3);
-            if (value < node.value) {
-                showComparisonBadge(`${value} < ${node.value} → GO LEFT`);
-                logMessage(`Compare: ${value} < ${node.value}. Moving left.`);
-                await sleep(animationDelay);
-                highlightCodeLine(4);
-                node.state = 'normal';
-                node.left = await deleteNodeAnimated(node.left, value);
-                return node;
-            } else if (value > node.value) {
-                highlightCodeLine(5);
-                showComparisonBadge(`${value} > ${node.value} → GO RIGHT`);
-                logMessage(`Compare: ${value} > ${node.value}. Moving right.`);
-                await sleep(animationDelay);
-                highlightCodeLine(6);
-                node.state = 'normal';
-                node.right = await deleteNodeAnimated(node.right, value);
-                return node;
-            } else {
-                // Found Target Node
-                highlightCodeLine(7);
-                node.state = 'target';
-                drawTree();
-                showComparisonBadge(`TARGET NODE [${value}] FOUND`);
-                logMessage(`Found target node [${value}] to delete.`);
-                await sleep(animationDelay * 1.2);
-
-                // Case 1: Leaf Node
-                if (!node.left && !node.right) {
-                    highlightCodeLine(8);
-                    showComparisonBadge(`CASE 1: LEAF NODE REMOVAL`);
-                    logMessage(`Deleting Leaf Node [${node.value}] (0 children).`);
-                    await sleep(animationDelay * 1.5);
+            function recDelete(node, targetVal) {
+                if (!node) {
+                    steps.push({
+                        line: 2,
+                        activeVal: null,
+                        explanation: `Reached NULL pointer. Target key ${targetVal} not found.`,
+                        decision: `NOT FOUND`,
+                        treeState: cloneTree(tempRoot)
+                    });
                     return null;
                 }
 
-                // Case 2: Single Child (Right child only)
-                if (!node.left) {
-                    highlightCodeLine(9);
-                    showComparisonBadge(`CASE 2: 1-CHILD (RIGHT SUCCESSOR)`);
-                    logMessage(`Node [${node.value}] has 1 right child. Replacing with child.`);
-                    await sleep(animationDelay * 1.5);
-                    return node.right;
+                steps.push({
+                    line: 3,
+                    activeVal: node.value,
+                    stateClass: 'active',
+                    explanation: `Searching for node ${targetVal}. Currently at node (${node.value}).`,
+                    decision: `CHECK (${node.value})`,
+                    treeState: cloneTree(tempRoot)
+                });
+
+                if (targetVal < node.value) {
+                    steps.push({
+                        line: 3,
+                        activeVal: node.value,
+                        stateClass: 'active',
+                        edgeFrom: node.value,
+                        edgeTo: node.left ? node.left.value : null,
+                        branchDir: '< LEFT',
+                        explanation: `${targetVal} < ${node.value}. Recursing down LEFT subtree.`,
+                        decision: `SEARCH LEFT`,
+                        treeState: cloneTree(tempRoot)
+                    });
+                    node.left = recDelete(node.left, targetVal);
+                    return node;
+                } else if (targetVal > node.value) {
+                    steps.push({
+                        line: 4,
+                        activeVal: node.value,
+                        stateClass: 'active',
+                        edgeFrom: node.value,
+                        edgeTo: node.right ? node.right.value : null,
+                        branchDir: 'RIGHT >',
+                        explanation: `${targetVal} > ${node.value}. Recursing down RIGHT subtree.`,
+                        decision: `SEARCH RIGHT`,
+                        treeState: cloneTree(tempRoot)
+                    });
+                    node.right = recDelete(node.right, targetVal);
+                    return node;
+                } else {
+                    // Match found! Identify deletion case
+                    steps.push({
+                        line: 5,
+                        activeVal: node.value,
+                        stateClass: 'delete',
+                        explanation: `TARGET MATCH FOUND! Node (${node.value}) selected for deletion.`,
+                        decision: `MATCH FOUND`,
+                        treeState: cloneTree(tempRoot)
+                    });
+
+                    // Case 1: Leaf Node
+                    if (!node.left && !node.right) {
+                        steps.push({
+                            line: 6,
+                            activeVal: node.value,
+                            stateClass: 'delete',
+                            explanation: `DELETION CASE 1 (Leaf Node): Node (${node.value}) has no children. Freeing memory.`,
+                            decision: `CASE 1: LEAF`,
+                            treeState: cloneTree(tempRoot)
+                        });
+                        return null;
+                    }
+                    // Case 2: One child (Left is NULL)
+                    else if (!node.left) {
+                        steps.push({
+                            line: 6,
+                            activeVal: node.right.value,
+                            stateClass: 'successor',
+                            explanation: `DELETION CASE 2 (Single Child): Replacing node (${node.value}) with RIGHT child (${node.right.value}).`,
+                            decision: `CASE 2: R-CHILD`,
+                            treeState: cloneTree(tempRoot)
+                        });
+                        return node.right;
+                    }
+                    // Case 2: One child (Right is NULL)
+                    else if (!node.right) {
+                        steps.push({
+                            line: 7,
+                            activeVal: node.left.value,
+                            stateClass: 'successor',
+                            explanation: `DELETION CASE 2 (Single Child): Replacing node (${node.value}) with LEFT child (${node.left.value}).`,
+                            decision: `CASE 2: L-CHILD`,
+                            treeState: cloneTree(tempRoot)
+                        });
+                        return node.left;
+                    }
+                    // Case 3: Two Children (Find In-Order Successor)
+                    else {
+                        steps.push({
+                            line: 8,
+                            activeVal: node.value,
+                            stateClass: 'delete',
+                            explanation: `DELETION CASE 3 (Two Children): Finding In-Order Successor (min node in right subtree).`,
+                            decision: `CASE 3: FIND SUCC`,
+                            treeState: cloneTree(tempRoot)
+                        });
+
+                        let succ = node.right;
+                        while (succ.left) succ = succ.left;
+
+                        steps.push({
+                            line: 8,
+                            activeVal: succ.value,
+                            stateClass: 'successor',
+                            explanation: `In-Order Successor located! Smallest right key is (${succ.value}).`,
+                            decision: `SUCC IS ${succ.value}`,
+                            treeState: cloneTree(tempRoot)
+                        });
+
+                        node.value = succ.value;
+                        steps.push({
+                            line: 9,
+                            activeVal: node.value,
+                            stateClass: 'found',
+                            explanation: `Copied successor value ${succ.value} into target node position.`,
+                            decision: `COPY SUCC`,
+                            treeState: cloneTree(tempRoot)
+                        });
+
+                        steps.push({
+                            line: 10,
+                            activeVal: succ.value,
+                            stateClass: 'delete',
+                            explanation: `Recursively deleting duplicate successor node (${succ.value}) from right subtree.`,
+                            decision: `DELETE SUCC`,
+                            treeState: cloneTree(tempRoot)
+                        });
+                        node.right = recDelete(node.right, succ.value);
+                        return node;
+                    }
+                }
+            }
+
+            const finalTree = recDelete(tempRoot, val);
+            steps.push({
+                line: 12,
+                activeVal: null,
+                explanation: `Deletion process for key ${val} completed.`,
+                decision: `DONE`,
+                treeState: cloneTree(finalTree)
+            });
+
+            return steps;
+        }
+
+        function generateTraversalSteps(type) {
+            const steps = [];
+            currentOperationType = 'traversal';
+            const visitedOrder = [];
+
+            if (!bst.root) {
+                steps.push({
+                    line: 2,
+                    activeVal: null,
+                    explanation: `Cannot perform ${type} traversal on an empty tree!`,
+                    decision: `EMPTY TREE`
+                });
+                return steps;
+            }
+
+            function traverse(node) {
+                if (!node) return;
+
+                steps.push({
+                    line: 2,
+                    activeVal: node.value,
+                    stateClass: 'active',
+                    explanation: `Traversing node key ${node.value}.`,
+                    decision: `VISIT: ${node.value}`
+                });
+
+                if (type === 'preorder') {
+                    visitedOrder.push(node.value);
+                    steps.push({
+                        line: 4,
+                        activeVal: [...visitedOrder],
+                        stateClass: 'visited',
+                        explanation: `[Pre-Order] Processed node key ${node.value}. Current Order: [${visitedOrder.join(', ')}]`,
+                        decision: `RECORD ${node.value}`
+                    });
                 }
 
-                // Case 2: Single Child (Left child only)
-                if (!node.right) {
-                    highlightCodeLine(10);
-                    showComparisonBadge(`CASE 2: 1-CHILD (LEFT SUCCESSOR)`);
-                    logMessage(`Node [${node.value}] has 1 left child. Replacing with child.`);
-                    await sleep(animationDelay * 1.5);
-                    return node.left;
+                if (node.left) {
+                    steps.push({
+                        line: 3,
+                        activeVal: node.value,
+                        edgeFrom: node.value,
+                        edgeTo: node.left.value,
+                        branchDir: '< LEFT',
+                        explanation: `Moving down LEFT subtree of node ${node.value}.`,
+                        decision: `LEFT CHILD`
+                    });
+                    traverse(node.left);
                 }
 
-                // Case 3: Two Children Node
-                highlightCodeLine(11);
-                showComparisonBadge(`CASE 3: TWO CHILDREN NODE`);
-                logMessage(`Node [${node.value}] has 2 children. Finding In-Order Successor (min in right subtree)...`);
-                await sleep(animationDelay);
-
-                // Find Min in Right Subtree
-                let successor = node.right;
-                while (successor.left) {
-                    successor = successor.left;
+                if (type === 'inorder') {
+                    visitedOrder.push(node.value);
+                    steps.push({
+                        line: 4,
+                        activeVal: [...visitedOrder],
+                        stateClass: 'visited',
+                        explanation: `[In-Order] Processed node key ${node.value}. Current Order: [${visitedOrder.join(', ')}]`,
+                        decision: `RECORD ${node.value}`
+                    });
                 }
 
-                successor.state = 'visiting';
-                drawTree();
-                showComparisonBadge(`SUCCESSOR FOUND: [${successor.value}]`);
-                logMessage(`In-Order Successor is [${successor.value}]. Swapping values...`);
-                await sleep(animationDelay * 1.5);
+                if (node.right) {
+                    steps.push({
+                        line: 5,
+                        activeVal: node.value,
+                        edgeFrom: node.value,
+                        edgeTo: node.right.value,
+                        branchDir: 'RIGHT >',
+                        explanation: `Moving down RIGHT subtree of node ${node.value}.`,
+                        decision: `RIGHT CHILD`
+                    });
+                    traverse(node.right);
+                }
 
-                highlightCodeLine(12);
-                node.value = successor.value;
-                drawTree();
-                await sleep(animationDelay);
+                if (type === 'postorder') {
+                    visitedOrder.push(node.value);
+                    steps.push({
+                        line: 4,
+                        activeVal: [...visitedOrder],
+                        stateClass: 'visited',
+                        explanation: `[Post-Order] Processed node key ${node.value}. Current Order: [${visitedOrder.join(', ')}]`,
+                        decision: `RECORD ${node.value}`
+                    });
+                }
+            }
 
-                highlightCodeLine(13);
-                logMessage(`Recursively deleting original successor node [${successor.value}] from right subtree.`);
-                node.right = await deleteNodeAnimated(node.right, successor.value);
+            if (type === 'levelorder') {
+                const queue = [bst.root];
+                while (queue.length > 0) {
+                    const node = queue.shift();
+                    visitedOrder.push(node.value);
+                    steps.push({
+                        line: 4,
+                        activeVal: [...visitedOrder],
+                        stateClass: 'visited',
+                        explanation: `[Level-Order] Visited node key ${node.value}. Queue sequence: [${visitedOrder.join(', ')}]`,
+                        decision: `VISIT ${node.value}`
+                    });
+                    if (node.left) queue.push(node.left);
+                    if (node.right) queue.push(node.right);
+                }
+            } else {
+                traverse(bst.root);
+            }
+
+            steps.push({
+                line: 5,
+                activeVal: [...visitedOrder],
+                stateClass: 'visited',
+                explanation: `${type.toUpperCase()} Traversal Complete! Result Sequence: [${visitedOrder.join(', ')}]`,
+                decision: `COMPLETE`
+            });
+
+            return steps;
+        }
+
+        /* ==========================================================================
+           6. EXECUTION ENGINE & PLAYBACK CONTROLLER
+           ========================================================================== */
+        function loadSteps(steps) {
+            pausePlayback();
+            executionSteps = steps;
+            currentStepIndex = -1;
+            if (executionSteps.length > 0) {
+                stepForward();
+            }
+        }
+
+        function renderStep(index) {
+            if (index < 0 || index >= executionSteps.length) return;
+            const step = executionSteps[index];
+
+            // Render active source code
+            renderCodePanel(currentOperationType, step.line);
+
+            // Render step visualization
+            drawTree(
+                step.activeVal,
+                step.stateClass || 'active',
+                step.edgeFrom || null,
+                step.edgeTo || null,
+                step.branchDir || null,
+                step.treeState !== undefined ? step.treeState : null
+            );
+
+            // Update UI textual indicators
+            showDialogue(step.explanation);
+            document.getElementById('decisionText').textContent = step.decision || 'READY';
+
+            // Traversal result display
+            const travText = document.getElementById('traversalResultText');
+            if (Array.isArray(step.activeVal) && step.stateClass === 'visited') {
+                travText.textContent = `Visited: [ ${step.activeVal.join(', ')} ]`;
+            } else {
+                travText.textContent = '';
+            }
+        }
+
+        function stepForward() {
+            if (currentStepIndex < executionSteps.length - 1) {
+                currentStepIndex++;
+                renderStep(currentStepIndex);
+            } else {
+                pausePlayback();
+            }
+        }
+
+        function stepBack() {
+            if (currentStepIndex > 0) {
+                currentStepIndex--;
+                renderStep(currentStepIndex);
+            }
+        }
+
+        function togglePlayPause() {
+            if (isPlaying) {
+                pausePlayback();
+            } else {
+                startPlayback();
+            }
+        }
+
+        function startPlayback() {
+            if (currentStepIndex >= executionSteps.length - 1) {
+                currentStepIndex = -1;
+            }
+            isPlaying = true;
+            const btn = document.getElementById('btnPlayPause');
+            btn.classList.replace('pixel-btn-green', 'pixel-btn-gold');
+            btn.querySelector('span').textContent = 'Pause';
+
+            playbackTimer = setInterval(() => {
+                if (currentStepIndex < executionSteps.length - 1) {
+                    stepForward();
+                } else {
+                    pausePlayback();
+                }
+            }, playbackSpeed);
+        }
+
+        function pausePlayback() {
+            isPlaying = false;
+            if (playbackTimer) clearInterval(playbackTimer);
+            playbackTimer = null;
+            const btn = document.getElementById('btnPlayPause');
+            if (btn) {
+                btn.classList.replace('pixel-btn-gold', 'pixel-btn-green');
+                btn.querySelector('span').textContent = 'Play';
+            }
+        }
+
+        function resetPlayback() {
+            pausePlayback();
+            if (executionSteps.length > 0) {
+                currentStepIndex = 0;
+                renderStep(0);
+            }
+        }
+
+        function finishPlayback() {
+            pausePlayback();
+            if (executionSteps.length > 0) {
+                currentStepIndex = executionSteps.length - 1;
+                renderStep(currentStepIndex);
+            }
+        }
+
+        function updateSpeed() {
+            const slider = document.getElementById('speedSlider');
+            playbackSpeed = parseInt(slider.value, 10);
+            document.getElementById('speedValue').textContent = `${playbackSpeed}ms`;
+            if (isPlaying) {
+                pausePlayback();
+                startPlayback();
+            }
+        }
+
+        /* ==========================================================================
+           7. UI CONTROLLER & HANDLERS
+           ========================================================================== */
+        function renderCodePanel(opType = 'insert', highlightLine = -1) {
+            const codeDisplay = document.getElementById('codeDisplay');
+            if (!codeDisplay) return;
+
+            const lines = CODE_TEMPLATES.c[opType] || CODE_TEMPLATES.c.insert;
+            codeDisplay.innerHTML = lines.map((lineText, idx) => {
+                const lineNum = idx + 1;
+                const isActive = (lineNum === highlightLine);
+                return `<div class="code-line ${isActive ? 'active' : ''}">${String(lineNum).padStart(2, ' ')} |  ${escapeHtml(lineText)}</div>`;
+            }).join('');
+
+            // Auto-scroll highlighted code line into view
+            const activeElem = codeDisplay.querySelector('.code-line.active');
+            if (activeElem) {
+                activeElem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function handleInsert() {
+            const input = document.getElementById('nodeInput');
+            const rawVal = input.value.trim();
+            if (!rawVal) {
+                showDialogue("Please enter an integer or comma-separated numbers to insert!");
+                return;
+            }
+
+            const values = rawVal.split(',').map(v => parseInt(v.trim(), 10)).filter(v => !isNaN(v));
+            if (values.length === 0) {
+                showDialogue("Invalid input! Please enter valid integers.");
+                return;
+            }
+
+            const val = values[0];
+            const steps = generateInsertSteps(val);
+            
+            // Commit to actual BST structure
+            const inserted = bst.insert(val);
+            if (inserted) {
+                logHistory(`Inserted node (${val}) into BST.`);
+                updateTreeStats();
+            }
+
+            loadSteps(steps);
+            input.value = values.slice(1).join(',');
+        }
+
+        function handleSearch() {
+            const input = document.getElementById('nodeInput');
+            const val = parseInt(input.value.trim(), 10);
+            if (isNaN(val)) {
+                showDialogue("Please enter a valid integer to search!");
+                return;
+            }
+
+            const steps = generateSearchSteps(val);
+            logHistory(`Searched key (${val}) in tree.`);
+            loadSteps(steps);
+        }
+
+        function handleDelete() {
+            const input = document.getElementById('nodeInput');
+            const val = parseInt(input.value.trim(), 10);
+            if (isNaN(val)) {
+                showDialogue("Please enter a valid integer to delete!");
+                return;
+            }
+
+            const steps = generateDeleteSteps(val);
+            
+            // Perform actual deletion mutation on underlying BST
+            function deleteFromBST(node, k) {
+                if (!node) return null;
+                if (k < node.value) node.left = deleteFromBST(node.left, k);
+                else if (k > node.value) node.right = deleteFromBST(node.right, k);
+                else {
+                    if (!node.left) return node.right;
+                    if (!node.right) return node.left;
+                    let succ = node.right;
+                    while (succ.left) succ = succ.left;
+                    node.value = succ.value;
+                    node.right = deleteFromBST(node.right, succ.value);
+                }
                 return node;
             }
-        }
 
-        // --- Utility Actions ---
-        function handleClear() {
-            if (isAnimating) return;
-            bst.root = null;
-            drawTree();
-            logMessage("Tree cleared.");
-        }
-
-        function handleGenerateRandom() {
-            if (isAnimating) return;
-            bst.root = null;
-            const count = Math.floor(Math.random() * 4) + 6; // 6 to 9 nodes
-            const values = new Set();
-            while (values.size < count) {
-                values.add(Math.floor(Math.random() * 90) + 5);
+            if (bst.contains(bst.root, val)) {
+                bst.root = deleteFromBST(bst.root, val);
+                logHistory(`Deleted key (${val}) from BST.`);
+                updateTreeStats();
             }
-            values.forEach(val => rawInsert(bst, val));
-            recalculateNodePositions();
-            resetNodeStates();
-            drawTree();
-            logMessage(`Generated new random tree with ${count} nodes.`);
+
+            loadSteps(steps);
+            input.value = '';
         }
+
+        function handleTraversal(type) {
+            const steps = generateTraversalSteps(type);
+            logHistory(`Executed ${type.toUpperCase()} traversal.`);
+            loadSteps(steps);
+        }
+
+        function generateRandomTree() {
+            bst.root = null;
+            const count = 7;
+            const nums = new Set();
+            while (nums.size < count) {
+                nums.add(Math.floor(Math.random() * 90) + 10);
+            }
+
+            const arr = Array.from(nums);
+            arr.forEach(n => bst.insert(n));
+
+            updateTreeStats();
+            logHistory(`Generated random tree: [${arr.join(', ')}]`);
+            showDialogue(`Random Binary Search Tree generated with values: ${arr.join(', ')}.`);
+            
+            // Generate visual presentation for random tree load
+            loadSteps([{
+                line: 1,
+                activeVal: bst.root ? bst.root.value : null,
+                stateClass: 'normal',
+                explanation: `Generated new random Binary Search Tree.`,
+                decision: `RANDOM TREE`,
+                treeState: cloneTree(bst.root)
+            }]);
+        }
+
+        function confirmClearTree() {
+            if (!bst.root) {
+                showDialogue("Tree is already empty!");
+                return;
+            }
+            toggleModal('confirmModal');
+        }
+
+        function clearTree() {
+            bst.root = null;
+            pausePlayback();
+            executionSteps = [];
+            currentStepIndex = -1;
+
+            const svg = document.getElementById('bstSvg');
+            if (svg) svg.innerHTML = '';
+
+            updateTreeStats();
+            logHistory("Cleared entire tree structure.");
+            showDialogue("Binary Search Tree has been reset to empty state.");
+            document.getElementById('decisionText').textContent = 'READY';
+            document.getElementById('traversalResultText').textContent = '';
+            renderCodePanel('insert', -1);
+            toggleModal('confirmModal');
+        }
+
+        /* ==========================================================================
+           8. HELPERS, STATS & INITIALIZATION
+           ========================================================================== */
+        function updateTreeStats() {
+            const rootVal = bst.root ? bst.root.value : 'N/A';
+            const nodeCount = bst.getNodeCount();
+            const height = bst.getHeight();
+            const leafCount = bst.getLeafCount();
+            const minVal = bst.getMin() !== null ? bst.getMin() : 'N/A';
+            const maxVal = bst.getMax() !== null ? bst.getMax() : 'N/A';
+
+            document.getElementById('statRoot').textContent = rootVal;
+            document.getElementById('statNodes').textContent = nodeCount;
+            document.getElementById('statHeight').textContent = height;
+            document.getElementById('statLeaves').textContent = leafCount;
+            document.getElementById('statMin').textContent = minVal;
+            document.getElementById('statMax').textContent = maxVal;
+
+            const statusBadge = document.getElementById('treeStatusBadge');
+            if (nodeCount > 0) {
+                statusBadge.textContent = `STATUS: ${nodeCount} NODE${nodeCount > 1 ? 'S' : ''}`;
+                statusBadge.className = "pixel-box-parchment px-3 py-1.5 text-[10px] font-pixel text-leafgreen font-bold";
+            } else {
+                statusBadge.textContent = "STATUS: EMPTY TREE";
+                statusBadge.className = "pixel-box-parchment px-3 py-1.5 text-[10px] font-pixel text-darkwood";
+            }
+        }
+
+        function showDialogue(text) {
+            const el = document.getElementById('dialogueText');
+            if (el) el.innerHTML = text;
+        }
+
+        function logHistory(actionText) {
+            const log = document.getElementById('historyLog');
+            if (!log) return;
+            const li = document.createElement('li');
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            li.textContent = `• [${time}] ${actionText}`;
+            log.insertBefore(li, log.firstChild);
+        }
+
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.toggle('hidden');
+            }
+        }
+
+        // Initialize application default state on load
+        window.addEventListener('load', () => {
+            renderCodePanel('insert', 1);
+            generateRandomTree();
+            window.addEventListener('resize', () => {
+                if (executionSteps.length > 0 && currentStepIndex >= 0) {
+                    renderStep(currentStepIndex);
+                } else {
+                    drawTree();
+                }
+            });
+        });
     </script>
 </body>
 </html>
