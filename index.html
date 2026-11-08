@@ -1342,48 +1342,220 @@
                 return steps;
             }
 
-            const tempBST = new BinarySearchTree();
-            tempBST.root = cloneTree(bst.root);
+            const tempTree = cloneTree(bst.root);
 
             steps.push({
                 line: 0,
-                tree: cloneTree(tempBST.root),
-                activeVal: val,
-                stateClass: 'delete',
-                dialogue: `Initiating deletion for target node <b>${val}</b>.`,
-                action: `TARGETING [${val}]`
+                tree: cloneTree(tempTree),
+                activeVal: tempTree.value,
+                stateClass: 'active',
+                dialogue: `Starting deletion search for target value <b>${val}</b> at root <b>${tempTree.value}</b>.`,
+                action: `TARGET [${val}]`
             });
 
-            function deleteNode(node, v) {
-                if (!node) return null;
-                const cmp = compareKeys(v, node.value);
-                if (cmp < 0) {
-                    node.left = deleteNode(node.left, v);
-                } else if (cmp > 0) {
-                    node.right = deleteNode(node.right, v);
-                } else {
-                    if (!node.left) return node.right;
-                    if (!node.right) return node.left;
-
-                    let succ = node.right;
-                    while (succ.left) succ = succ.left;
-                    node.value = succ.value;
-                    node.right = deleteNode(node.right, succ.value);
+            function traceDelete(node, target, path = []) {
+                if (!node) {
+                    steps.push({
+                        line: 1,
+                        tree: cloneTree(tempTree),
+                        activeVal: null,
+                        dialogue: `Value <b>${target}</b> not found in the tree. No node deleted.`,
+                        action: `[${target}] NOT FOUND`
+                    });
+                    return null;
                 }
-                return node;
+
+                const cmp = compareKeys(target, node.value);
+
+                if (cmp < 0) {
+                    steps.push({
+                        line: 2,
+                        tree: cloneTree(tempTree),
+                        activeVal: node.value,
+                        stateClass: 'active',
+                        edgeFrom: node.value,
+                        edgeTo: node.left ? node.left.value : null,
+                        branchDir: 'left',
+                        dialogue: `<b>${target} &lt; ${node.value}</b>: Searching left subtree.`,
+                        action: `SEARCH LEFT FROM [${node.value}]`
+                    });
+
+                    if (!node.left) {
+                        steps.push({
+                            line: 1,
+                            tree: cloneTree(tempTree),
+                            activeVal: null,
+                            dialogue: `Reached NULL left child. Value <b>${target}</b> does not exist in the BST.`,
+                            action: `[${target}] NOT FOUND`
+                        });
+                        return node;
+                    }
+                    node.left = traceDelete(node.left, target, [...path, { parent: node, dir: 'left' }]);
+                    return node;
+                } else if (cmp > 0) {
+                    steps.push({
+                        line: 4,
+                        tree: cloneTree(tempTree),
+                        activeVal: node.value,
+                        stateClass: 'active',
+                        edgeFrom: node.value,
+                        edgeTo: node.right ? node.right.value : null,
+                        branchDir: 'right',
+                        dialogue: `<b>${target} &gt; ${node.value}</b>: Searching right subtree.`,
+                        action: `SEARCH RIGHT FROM [${node.value}]`
+                    });
+
+                    if (!node.right) {
+                        steps.push({
+                            line: 1,
+                            tree: cloneTree(tempTree),
+                            activeVal: null,
+                            dialogue: `Reached NULL right child. Value <b>${target}</b> does not exist in the BST.`,
+                            action: `[${target}] NOT FOUND`
+                        });
+                        return node;
+                    }
+                    node.right = traceDelete(node.right, target, [...path, { parent: node, dir: 'right' }]);
+                    return node;
+                } else {
+                    // Node Found!
+                    steps.push({
+                        line: 6,
+                        tree: cloneTree(tempTree),
+                        activeVal: node.value,
+                        stateClass: 'delete',
+                        dialogue: `Target node <b>${node.value}</b> located! Evaluating deletion case.`,
+                        action: `FOUND TARGET [${node.value}]`
+                    });
+
+                    // Case 1 & Case 2 (Left is NULL)
+                    if (!node.left) {
+                        const childVal = node.right ? node.right.value : 'NULL';
+                        steps.push({
+                            line: 7,
+                            tree: cloneTree(tempTree),
+                            activeVal: node.value,
+                            stateClass: 'delete',
+                            dialogue: `Left child is NULL. ${node.right ? `Replacing node <b>${node.value}</b> with right child <b>${childVal}</b>.` : `Node <b>${node.value}</b> is a leaf node.`}`,
+                            action: node.right ? `CASE 2: SINGLE CHILD [${childVal}]` : `CASE 1: LEAF NODE`
+                        });
+
+                        steps.push({
+                            line: 9,
+                            tree: cloneTree(tempTree),
+                            activeVal: node.value,
+                            stateClass: 'delete',
+                            dialogue: `Freeing memory for node <b>${node.value}</b>.`,
+                            action: `FREE NODE [${node.value}]`
+                        });
+
+                        const resultNode = node.right;
+                        if (path.length > 0) {
+                            const last = path[path.length - 1];
+                            last.parent[last.dir] = resultNode;
+                        }
+
+                        steps.push({
+                            line: 10,
+                            tree: cloneTree(tempTree),
+                            activeVal: null,
+                            stateClass: 'normal',
+                            dialogue: `Node <b>${target}</b> deleted successfully!`,
+                            action: `DELETED [${target}]`
+                        });
+
+                        return resultNode;
+                    } 
+                    // Case 2 (Right is NULL)
+                    else if (!node.right) {
+                        const childVal = node.left.value;
+                        steps.push({
+                            line: 11,
+                            tree: cloneTree(tempTree),
+                            activeVal: node.value,
+                            stateClass: 'delete',
+                            dialogue: `Right child is NULL. Replacing node <b>${node.value}</b> with left child <b>${childVal}</b>.`,
+                            action: `CASE 2: SINGLE CHILD [${childVal}]`
+                        });
+
+                        steps.push({
+                            line: 13,
+                            tree: cloneTree(tempTree),
+                            activeVal: node.value,
+                            stateClass: 'delete',
+                            dialogue: `Freeing memory for node <b>${node.value}</b>.`,
+                            action: `FREE NODE [${node.value}]`
+                        });
+
+                        const resultNode = node.left;
+                        if (path.length > 0) {
+                            const last = path[path.length - 1];
+                            last.parent[last.dir] = resultNode;
+                        }
+
+                        steps.push({
+                            line: 14,
+                            tree: cloneTree(tempTree),
+                            activeVal: null,
+                            stateClass: 'normal',
+                            dialogue: `Node <b>${target}</b> deleted successfully!`,
+                            action: `DELETED [${target}]`
+                        });
+
+                        return resultNode;
+                    }
+                    // Case 3 (Two Children)
+                    else {
+                        steps.push({
+                            line: 16,
+                            tree: cloneTree(tempTree),
+                            activeVal: node.value,
+                            stateClass: 'delete',
+                            dialogue: `Node <b>${node.value}</b> has TWO children! Finding In-Order Successor in right subtree...`,
+                            action: `CASE 3: TWO CHILDREN`
+                        });
+
+                        let succ = node.right;
+                        while (succ.left) succ = succ.left;
+
+                        steps.push({
+                            line: 16,
+                            tree: cloneTree(tempTree),
+                            activeVal: succ.value,
+                            stateClass: 'successor',
+                            dialogue: `Found In-Order Successor <b>${succ.value}</b> (leftmost node of right subtree).`,
+                            action: `FOUND SUCCESSOR [${succ.value}]`
+                        });
+
+                        const origVal = node.value;
+                        node.value = succ.value;
+
+                        steps.push({
+                            line: 17,
+                            tree: cloneTree(tempTree),
+                            activeVal: node.value,
+                            stateClass: 'found',
+                            dialogue: `Copied successor value <b>${succ.value}</b> into node position (overwriting <b>${origVal}</b>).`,
+                            action: `COPY SUCC [${succ.value}] -> [${origVal}]`
+                        });
+
+                        steps.push({
+                            line: 18,
+                            tree: cloneTree(tempTree),
+                            activeVal: succ.value,
+                            stateClass: 'delete',
+                            dialogue: `Now recursively deleting original successor node <b>${succ.value}</b> from right subtree.`,
+                            action: `DELETE SUCC [${succ.value}]`
+                        });
+
+                        node.right = traceDelete(node.right, succ.value, [...path, { parent: node, dir: 'right' }]);
+
+                        return node;
+                    }
+                }
             }
 
-            tempBST.root = deleteNode(tempBST.root, val);
-
-            steps.push({
-                line: 6,
-                tree: cloneTree(tempBST.root),
-                activeVal: null,
-                stateClass: 'normal',
-                dialogue: `Node <b>${val}</b> successfully deleted and tree rebalanced.`,
-                action: `DELETED [${val}]`
-            });
-
+            traceDelete(tempTree, val);
             return steps;
         }
 
